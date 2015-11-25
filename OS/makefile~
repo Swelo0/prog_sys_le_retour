@@ -20,5 +20,6 @@ run: $(OUTPUT).iso
 
 clean:
 	@make -C kernel clean
+	@make -C doc clean
 	rm -rf $(OUTPUT) $(OUTPUT).iso
 
