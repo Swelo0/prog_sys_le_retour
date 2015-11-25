@@ -1,0 +1,28 @@
+OUTPUT=build
+
+MODE=normal
+
+.PHONY: clean run kernel doc
+
+$(OUTPUT).iso: kernel grub/grub.cfg $(OUTPUT)/boot/grub
+	cp grub/grub.cfg $(OUTPUT)/boot/grub/
+	cp kernel/kernel.elf $(OUTPUT)/boot/
+	grub-mkrescue -o $@ $(OUTPUT)
+
+kernel:
+	@make -C kernel MODE=$(MODE)
+
+$(OUTPUT)/boot/grub:
+	mkdir -p $@
+
+doc:
+	@make -C doc
+
+run: $(OUTPUT).iso
+	qemu-system-i386 -hda $<
+
+clean:
+	@make -C kernel clean
+	@make -C doc clean
+	rm -rf $(OUTPUT) $(OUTPUT).iso
+
