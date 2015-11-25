@@ -45,6 +45,7 @@ void exception_handler(struct regs_st *regs) {
 	// Message en rouge
 	set_text_color(RED);
 	printf("Exception %d ! Kernel will now halt.\r\n", regs->number);
+	set_text_color(WHITE);
 	
 	// Arrêt du kernel
 	halt();
@@ -73,10 +74,10 @@ void idt_init() {
 	
 	// [0..20]  --> Exceptions processeur
 	for (uint16_t i = 0; i < CPU_EXCEPTS; i++)
-		idt[i] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t) &isr_tab[i], TYPE_INTERRUPT_GATE, DPL_KERNEL);
+		idt[i] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t) isr_tab[i], TYPE_INTERRUPT_GATE, DPL_KERNEL);
 	// [32..47] --> 16 IRQ
 	for (uint16_t i = 0; i < IRQ_LIMIT; i++)
-		idt[i + IRQ_BASE] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t) &irq_tab[i], TYPE_INTERRUPT_GATE, DPL_KERNEL);
+		idt[i + IRQ_BASE] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t) irq_tab[i], TYPE_INTERRUPT_GATE, DPL_KERNEL);
 
 	// Chargement IDT dans le CPU
 	idt_flush(&idt_ptr);

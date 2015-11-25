@@ -1,5 +1,8 @@
 %include "const.inc"
 
+extern exception_handler
+extern irq_handler
+
 section .text   ; start of the text (code) section
 align 4         ; the code must be 4 byte aligned
 
@@ -15,6 +18,7 @@ idt_flush:
 ; CPU exceptions (no code)
 %macro isr_nocode 1
 global _isr_%1
+_isr_%1:
 	cli          	; disable interrupts
     push    0    	; dummy error code
     push    byte %1 ; exception number
@@ -25,6 +29,7 @@ global _isr_%1
 ; CPU exceptions (code)
 %macro isr_code 1
 global _isr_%1
+_isr_%1:
 	cli          	; disable interrupts
     push    byte %1 ; exception number
     jmp     exception_wrapper
@@ -34,6 +39,7 @@ global _isr_%1
 ; IRQ
 %macro irq 1
 global _irq_%1
+_irq_%1:
 	cli          	; disable interrupts
     push    0    	; dummy error code
     push    byte %1 ; exception number

@@ -45,7 +45,7 @@ periph.o: periph.s periph.h ../common/types.h
 io.o: io.c io.h ../common/types.h periph.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-pic.o:	pic.c pic.h ../common/types.h string.h
+pic.o:	pic.c pic.h ../common/types.h periph.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
 test.o: test.c test.h io.h periph.h ../common/types.h

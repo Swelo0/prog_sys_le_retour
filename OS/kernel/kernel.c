@@ -20,22 +20,22 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 void runKernel()
 {
+	
+	// Init VGA
+	init_display();
+	
     // Init GDT and IDT
-    gdt_init();
+	gdt_init();
+	print_str("GDT successfully loaded.\r\n");
 	idt_init();
-    
-    // Init VGA
-    init_display();
+	print_str("IDT successfully loaded.\r\n");
+	
+	print_str("Welcome in our humble kernel.\r\n");
     
     #ifdef TEST
     
     // Runs the test procedure if test mode is enabled
     runTests();
-    
-    #else
-    
-    // Prints a welcome message in normal mode
-    print_str("Welcome. This is the Kernel.\r\nThe GDT is ready.\r\nThe text display is ready.\r\n");
     
     #endif
     
