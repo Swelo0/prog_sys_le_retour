@@ -38,7 +38,7 @@ void runKernel()
 	print_str("IDT loaded.\r\n");
 	
 	// 100Hz timer
-	// timer_init(100);
+	timer_init(100);
 	
 	// Message
 	print_str("Welcome in our humble kernel.\r\n");
