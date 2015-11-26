@@ -6,6 +6,8 @@
 #include "io.h"
 #include "pic.h"
 #include "string.h"
+#include "timer.h"
+#include "keyboard.h"
 
 // Structure of an IDT descriptor. There are 3 types of descriptors:
 // a task-gate, an interrupt-gate, and a trap-gate.

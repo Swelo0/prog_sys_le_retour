@@ -10,8 +10,9 @@
 
 #include "gdt.h"
 #include "idt.h"
-#include "periph.h"
 #include "io.h"
+#include "timer.h"
+#include "pic.h"
 
 #ifdef TEST
 #include "test.h"
@@ -24,21 +25,32 @@ void runKernel()
 	// Init VGA
 	init_display();
 	
-    // Init GDT and IDT
+    // Init GDT
 	gdt_init();
 	print_str("GDT successfully loaded.\r\n");
+	
+	// Init PIC
+	pic_init();
+	print_str("PIC init.\r\n");
+	
+	// Init IDT
 	idt_init();
 	print_str("IDT successfully loaded.\r\n");
 	
+	// Init 100Hz timer
+	timer_init(100);
+	
 	print_str("Welcome in our humble kernel.\r\n");
-    
+	
     #ifdef TEST
-    
-    // Runs the test procedure if test mode is enabled
-    runTests();
-    
+		runTests();
     #endif
-    
+ 
+	// Activation interruptions matérielles
+	sti();
+	print_str("IRQ enabled\r\n");
+	
     while(1);
+	
 }
 

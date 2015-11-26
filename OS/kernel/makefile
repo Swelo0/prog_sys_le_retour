@@ -21,7 +21,7 @@ kernel.elf: $(OBJS)
 bootloader.o: bootloader.s
 	$(ASMC) $< -o $@ $(ASMFLAGS)
 	
-kernel.o: kernel.c kernel.h gdt.h idt.h io.h ../common/types.h $(KERNEL_DEPENDENCIES)
+kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h io.h timer.o $(KERNEL_DEPENDENCIES)
 	$(CC) $< -o $@ $(CFLAGS)
 
 gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h
@@ -30,7 +30,7 @@ gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h
 gdt_asm.o: gdt_asm.s const.inc
 	$(ASMC) $< -o $@ $(ASMFLAGS)
 	
-idt.o:	idt.c idt.h io.h pic.h string.h x86.h ../common/types.h
+idt.o:	idt.c idt.h x86.h ../common/types.h io.h pic.h string.h timer.h keyboard.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
 idt_asm.o: idt_asm.s const.inc
@@ -48,13 +48,13 @@ io.o: io.c io.h ../common/types.h periph.h
 pic.o:	pic.c pic.h ../common/types.h periph.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-timer.o:	timer.c timer.h ../common/types.h
+timer.o:	timer.c timer.h ../common/types.h periph.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-keyboard.o:	keyboard.c
+keyboard.o:	keyboard.c keyboard.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-test.o: test.c test.h io.h periph.h ../common/types.h
+test.o: test.c test.h ../common/types.h io.h periph.h
 	$(CC) $< -o $@ $(CFLAGS)
 
 clean:

@@ -42,7 +42,7 @@ static idt_entry_t idt_build_entry(uint16_t selector, uint32_t offset, uint8_t t
 // Exception handler
 void exception_handler(struct regs_st *regs) {
 	
-	// Message en rouge
+	// Message
 	set_text_color(RED);
 	printf("Exception %d ! Kernel will now halt.\r\n", regs->number);
 	set_text_color(WHITE);
@@ -55,11 +55,25 @@ void exception_handler(struct regs_st *regs) {
 // IRQ handler
 void irq_handler(struct regs_st *regs) {
 	
+	uint32_t irq = regs->number;
+	
 	// Message de test
-	printf("IRQ %d\r\n", regs->number);
+	printf("IRQ %d\r\n", irq);
+	
+	// Appel du handler correspondant
+	switch(irq) {
+		case 0:
+				timer_handler();
+				break;
+		case 1:
+				keyboard_handler();
+				break;
+		default:
+				break;
+	}
 	
 	// Fin d'interruption
-	pic_eoi(regs->number);
+	pic_eoi(irq);
 	
 }
 

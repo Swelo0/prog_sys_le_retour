@@ -120,10 +120,10 @@ void set_cursor_offset(uint16_t offset)
     
     // Sets the cursor to the new position
     outb(CURSOR_COMMAND, CURSOR_POSITION_MSB);
-    outb(CURSOR_DATA, (uint8_t)(cursor_offset >> 8));
+    outb(CURSOR_DATA, (uint8_t) (cursor_offset >> 8));
     
     outb(CURSOR_COMMAND, CURSOR_POSITION_LSB);
-    outb(CURSOR_DATA, (uint8_t)(cursor_offset & 0xFF));
+    outb(CURSOR_DATA, (uint8_t) (cursor_offset & 0xFF));
 }
 
 uint16_t get_cursor_offset()

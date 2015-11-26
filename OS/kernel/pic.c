@@ -1,5 +1,4 @@
 #include "pic.h"
-#include "periph.h"
 #include "../common/types.h"
 
 // Initialize both PICs by remapping IRQ 0-15 to interrupts 32-47
