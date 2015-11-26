@@ -6,7 +6,7 @@ CFLAGS=-std=gnu99 -m32 -fno-builtin -ffreestanding -Wall -Wextra -c
 
 MODE=normal
 
-OBJS=bootloader.o kernel.o gdt.o gdt_asm.o idt.o idt_asm.o string.o periph.o io.o pic.o
+OBJS=bootloader.o kernel.o gdt.o gdt_asm.o idt.o idt_asm.o string.o periph.o io.o pic.o timer.o keyboard.o
 KERNEL_DEPENDENCIES=
 
 ifeq ($(MODE), test)
@@ -46,6 +46,12 @@ io.o: io.c io.h ../common/types.h periph.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
 pic.o:	pic.c pic.h ../common/types.h periph.h
+	$(CC) $< -o $@ $(CFLAGS)
+	
+timer.o:	timer.c timer.h ../common/types.h
+	$(CC) $< -o $@ $(CFLAGS)
+	
+keyboard.o:	keyboard.c
 	$(CC) $< -o $@ $(CFLAGS)
 	
 test.o: test.c test.h io.h periph.h ../common/types.h
