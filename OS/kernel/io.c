@@ -8,8 +8,6 @@
 
 #include "io.h"
 
-#include "periph.h"
-
 //////////////////////////////////// STATIC GLOBALS //////////////////////////////////////
 
 static uint16_t *display = (uint16_t*)TEXT_DISPLAY_ADDR; ///< Pointer to the display memory
@@ -58,6 +56,14 @@ void init_display()
 	outb(CURSOR_DATA, data);
 	
 	set_cursor_offset(0);
+	
+	// Confirmation message
+	printf("+--------------------- INIT -------------------\r\n");
+	printf("| Init VGA display .................. ");
+	set_text_color(LIGHT_GREEN);
+	printf("OK\r\n");
+	set_text_color(WHITE);
+	
 }
 
 void clear_display() 

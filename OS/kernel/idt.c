@@ -12,7 +12,7 @@ static void* isr_tab[CPU_EXCEPTS] = { _isr_0,  _isr_1,  _isr_2,  _isr_3,  _isr_4
 // IRQ
 static void* irq_tab[IRQ_LIMIT]   = { _irq_0,  _irq_1,  _irq_2,  _irq_3,  _irq_4,  _irq_5, _irq_6, _irq_7, _irq_8, _irq_9,
 								     _irq_10, _irq_11, _irq_12, _irq_13, _irq_14, _irq_15 };
-								
+					
 // CPU context used when saving/restoring context from an interrupt
 typedef struct regs_st {
     uint32_t gs, fs, es, ds;
@@ -57,9 +57,6 @@ void irq_handler(struct regs_st *regs) {
 	
 	uint32_t irq = regs->number;
 	
-	// Message de test
-	printf("IRQ %d\r\n", irq);
-	
 	// Appel du handler correspondant
 	switch(irq) {
 		case 0:
@@ -83,7 +80,7 @@ void idt_init() {
 	memset(&idt, 0, IDT_ENTRIES);
 	
 	// Initialisation pointeur
-	idt_ptr.limit = IDT_ENTRIES;
+	idt_ptr.limit = sizeof(idt);
 	idt_ptr.base  = (uint32_t) &idt;
 	
 	// [0..20]  --> Exceptions processeur
@@ -93,9 +90,13 @@ void idt_init() {
 	// [32..47] --> 16 IRQ
 	for (uint16_t i = 0; i < IRQ_LIMIT; i++)
 		idt[i + IRQ_BASE] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t) irq_tab[i], TYPE_INTERRUPT_GATE, DPL_KERNEL);
-
+		
 	// Chargement IDT dans le CPU
 	idt_flush(&idt_ptr);
 	
+	// Message de confirmation
+	set_text_color(LIGHT_GREEN);
+	printf("OK\r\n");
+	set_text_color(WHITE);
+	
 }
-

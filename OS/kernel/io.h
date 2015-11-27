@@ -10,6 +10,7 @@
 #define _IO_H_
 
 #include "../common/types.h"
+#include "periph.h"
 
 #define BLACK           0
 #define BLUE            1

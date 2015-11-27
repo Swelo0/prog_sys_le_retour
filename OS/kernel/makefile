@@ -24,7 +24,7 @@ bootloader.o: bootloader.s
 kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h io.h timer.o $(KERNEL_DEPENDENCIES)
 	$(CC) $< -o $@ $(CFLAGS)
 
-gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h
+gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
 
 gdt_asm.o: gdt_asm.s const.inc
@@ -45,10 +45,10 @@ periph.o: periph.s periph.h ../common/types.h
 io.o: io.c io.h ../common/types.h periph.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-pic.o:	pic.c pic.h ../common/types.h periph.h
+pic.o:	pic.c pic.h ../common/types.h periph.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-timer.o:	timer.c timer.h ../common/types.h periph.h
+timer.o:	timer.c timer.h ../common/types.h periph.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
 keyboard.o:	keyboard.c keyboard.h

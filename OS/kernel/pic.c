@@ -26,6 +26,11 @@ void pic_init() {
     outb(PIC2_DATA, 0x02);
     outb(PIC1_DATA, 0x01);
     outb(PIC2_DATA, 0x01);
+	
+	// Confirmation message
+	set_text_color(LIGHT_GREEN);
+	printf("OK\r\n");
+	set_text_color(WHITE);
 }
 
 // Send an EOI to the PICs given which IRQ was handled.

@@ -1,8 +1,5 @@
 #include "gdt.h"
 
-#include "x86.h"
-#include "string.h"
-
 // GDT
 static gdt_entry_t gdt[3];
 
@@ -49,6 +46,7 @@ static gdt_entry_t data_segment(uint32_t base, uint32_t limit, uint8_t dpl) {
 
 // Initialize the GDT
 void gdt_init() {
+
 	// Set the address and the size of the GDT in the pointer
 	gdt_ptr.limit = sizeof(gdt);
 	gdt_ptr.base = (uint32_t)&gdt;
@@ -60,5 +58,11 @@ void gdt_init() {
 
     // Load the GDT
     gdt_flush(&gdt_ptr);
+	
+	// Confirmation message
+	set_text_color(LIGHT_GREEN);
+	printf("OK\r\n");
+	set_text_color(WHITE);
+	
 }
 

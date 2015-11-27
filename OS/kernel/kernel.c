@@ -22,26 +22,34 @@
 void runKernel()
 {
 	
+	
+	
 	// VGA
 	init_display();
 	
     // GDT
+	printf("| Init Global Descriptor Table ...... ");
 	gdt_init();
-	print_str("GDT loaded.\r\n");
 	
 	// PIC
+	printf("| Init PIC .......................... ");
 	pic_init();
-	print_str("PIC init.\r\n");
 	
 	// IDT
+	printf("| Init Interrupt Descriptor Table ... ");
 	idt_init();
-	print_str("IDT loaded.\r\n");
 	
 	// 100Hz timer
+	printf("| Init Timer ........................ ");
 	timer_init(100);
 	
+	printf("+----------------------------------------------\r\n");
+	
+	// Wait 3s
+	sleep(3000);
+	
 	// Message
-	print_str("Welcome in our humble kernel.\r\n");
+	printf("\r\n\t\tWelcome in our humble kernel.\r\n");
 	
 	// Tests
     #ifdef TEST
@@ -50,7 +58,6 @@ void runKernel()
  
 	// Activation interruptions matérielles
 	sti();
-	print_str("IRQ enabled\r\n");
 	
     while(1);
 	

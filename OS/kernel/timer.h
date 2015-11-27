@@ -3,6 +3,7 @@
 
 #include "../common/types.h"
 #include "periph.h"
+#include "io.h"
 
 extern void timer_init(uint32_t freq_hz);
 extern void timer_handler();
