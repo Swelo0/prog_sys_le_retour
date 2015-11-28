@@ -51,7 +51,7 @@ pic.o:	pic.c pic.h ../common/types.h periph.h io.h
 timer.o:	timer.c timer.h ../common/types.h periph.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-keyboard.o:	keyboard.c keyboard.h
+keyboard.o:	keyboard.c keyboard.h periph.h io.h string.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
 test.o: test.c test.h ../common/types.h io.h periph.h

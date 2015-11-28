@@ -8,12 +8,6 @@
 
 #include "kernel.h"
 
-#include "gdt.h"
-#include "idt.h"
-#include "io.h"
-#include "timer.h"
-#include "pic.h"
-
 #ifdef TEST
 #include "test.h"
 #endif
@@ -21,8 +15,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 void runKernel()
 {
-	
-	
 	
 	// VGA
 	init_display();
@@ -43,13 +35,17 @@ void runKernel()
 	printf("| Init Timer ........................ ");
 	timer_init(100);
 	
+	// Keyboard
+	printf("| Init Keyboard ..................... ");
+	keyboard_init();
+	
 	printf("+----------------------------------------------\r\n");
 	
-	// Wait 3s
-	sleep(3000);
+	// Wait 2s
+	// sleep(2000);
 	
 	// Message
-	printf("\r\n\t\tWelcome in our humble kernel.\r\n");
+	printf("\r\n          Welcome in our humble kernel.\r\n\r\n");
 	
 	// Tests
     #ifdef TEST

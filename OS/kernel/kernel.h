@@ -9,6 +9,9 @@
 #ifndef _KERNEL_H_
 #define _KERNEL_H_
 
+#include "gdt.h"
+#include "idt.h"
+
 //////////////////////////////////////////////////////////////////////////////////////////
 /// \fn void runKernel()
 /// \brief Main kernel function.

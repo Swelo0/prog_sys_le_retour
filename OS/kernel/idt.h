@@ -3,9 +3,9 @@
 
 #include "../common/types.h"
 #include "x86.h"
+#include "string.h"
 #include "io.h"
 #include "pic.h"
-#include "string.h"
 #include "timer.h"
 #include "keyboard.h"
 
