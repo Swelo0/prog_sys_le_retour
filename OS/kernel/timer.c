@@ -23,7 +23,7 @@ void timer_init(uint32_t freq_hz) {
 		set_text_color(LIGHT_GREEN);
 		printf("OK");
 		set_text_color(WHITE);
-		printf(" %dHz\r\n", freq);
+		printf(" %dHz\n", freq);
 		
 	}
 	// Message d'erreur
@@ -31,7 +31,7 @@ void timer_init(uint32_t freq_hz) {
 		set_text_color(RED);
 		printf("KO");
 		set_text_color(WHITE);
-		printf(" %dHz\r\n", freq);
+		printf(" %dHz\n", freq);
 	}
 	
 }

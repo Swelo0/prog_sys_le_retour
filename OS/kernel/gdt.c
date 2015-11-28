@@ -61,7 +61,7 @@ void gdt_init() {
 	
 	// Confirmation message
 	set_text_color(LIGHT_GREEN);
-	printf("OK\r\n");
+	printf("OK\n");
 	set_text_color(WHITE);
 	
 }

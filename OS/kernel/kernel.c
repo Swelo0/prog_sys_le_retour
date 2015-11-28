@@ -39,13 +39,10 @@ void runKernel()
 	printf("| Init Keyboard ..................... ");
 	keyboard_init();
 	
-	printf("+----------------------------------------------\r\n");
-	
-	// Wait 2s
-	// sleep(2000);
-	
 	// Message
-	printf("\r\n          Welcome in our humble kernel.\r\n\r\n");
+	printf("+----------------------------------------------\n");
+	printf("          Welcome in our humble kernel.\n");
+	printf("+----------------------------------------------\n");
 	
 	// Tests
     #ifdef TEST
@@ -55,7 +52,8 @@ void runKernel()
 	// Activation interruptions matérielles
 	sti();
 	
-    while(1);
+	// Reading keyboard
+    while(1) getc();
 	
 }
 

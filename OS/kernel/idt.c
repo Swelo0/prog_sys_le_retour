@@ -43,9 +43,12 @@ static idt_entry_t idt_build_entry(uint16_t selector, uint32_t offset, uint8_t t
 void exception_handler(struct regs_st *regs) {
 	
 	// Message
+	printf("\n+----------------------------------------------\n");
 	set_text_color(RED);
-	printf("Exception %d ! Kernel will now halt.\r\n", regs->number);
+	printf("                Exception %d !\n", regs->number); 
+	printf("             Kernel will now halt.\n");
 	set_text_color(WHITE);
+	printf("+----------------------------------------------\n");
 	
 	// Arrêt du kernel
 	halt();
@@ -96,7 +99,7 @@ void idt_init() {
 	
 	// Message de confirmation
 	set_text_color(LIGHT_GREEN);
-	printf("OK\r\n");
+	printf("OK\n");
 	set_text_color(WHITE);
 	
 }

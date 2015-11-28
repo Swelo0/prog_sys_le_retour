@@ -1,20 +1,31 @@
 #include "keyboard.h"
 
-static char*    buffer[BUFFER_SIZE];
-static uint16_t index;
-static char chars[CHARS_ARRAY_SIZE] = { '\0', '?', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '\'', '^', '?' /*backspace*/, '\t', 
-										'q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', '?', '?', '\n', '?', 'a', 's',
-										'd', 'f', 'g', 'h', 'j', 'k', 'l', '?', '?', '?', '?' /*left shift*/, '$', 'y', 'x', 'c', 'v',
-										'b', 'n', 'm', ',', '.', '-', '?' /*right shift*/, '?' , '?' /*alt*/, ' ', '?' };
+static char    buffer[BUFFER_SIZE];
+static int 	   buffer_read;
+static int     buffer_write;
+static char chars_neutral[CHARS_ARRAY_SIZE] = { '\0', '?', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '\'', '^', '\0', '\t', 
+												'q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', '?', '?', '\0', '?', 'a', 's',
+												'd', 'f', 'g', 'h', 'j', 'k', 'l', '?', '?', '?', '\0', '$', 'y', 'x', 'c', 'v',
+												'b', 'n', 'm', ',', '.', '-', '\0', '?' , '?', ' ', '\0' };
+static char chars_shift[CHARS_ARRAY_SIZE] =   { '\0', '?', '+', '"', '*', '?', '%', '&', '/', '(', ')', '=', '?', '`', '\0', '?', 
+												'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P', '?', '!', '\n', '?', 'A', 'S',
+												'D', 'F', 'G', 'H', 'J', 'K', 'L', '?', '?', '?', '\0', '\0', 'Y', 'X', 'C', 'V',
+												'B', 'N', 'M', ';', ':', '_', '\0', '?' , '\0', ' ', '\0' };
+												
+static bool shift;
 
 void keyboard_init() {
 
+	shift = false;
+
+	// Buffer
 	memset(&buffer, 0, BUFFER_SIZE);
-	index = 0;
+	buffer_read = 0;
+	buffer_write = 0;
 	
 	// Message de confirmation
 	set_text_color(LIGHT_GREEN);
-	printf("OK\r\n");
+	printf("OK\n");
 	set_text_color(WHITE);
 	
 }
@@ -26,21 +37,44 @@ void keyboard_handler() {
 	uint8_t code  = (sc & 0x7F);
 	// Make (0) / Break (1)
 	uint8_t state = (sc >> 7);  
-
-	// Enregistrement au relachement (?)
-	if (state == 1) {
 	
-		/* DEBUG
-		if (code < CHARS_ARRAY_SIZE) 
-			printf("%x --> \"%c\"\r\n", code, chars[code]);
-		else 
-			printf("%x --> Unknown\r\n", code);
-		*/
+	// Inversion shift
+	if ((code == CODE_LEFT_SHIFT) || (code == CODE_RIGHT_SHIFT))
+		shift = !shift; 
+	// Retour à la ligne
+	else if ((code == CODE_ENTER) && (((buffer_write + 1) % BUFFER_SIZE) != buffer_read)) {
+		buffer[buffer_write] = '\n'; 
+		buffer_write = (buffer_write + 1) % BUFFER_SIZE; 
+	}
+	// Caractères
+	else if (state == 0) {
 			
-		// Ajout du caractère dans le buffer
-		buffer[index++] = chars[code];
-		// Affichage
-		getc();
+		char c;
+		if (shift) c = chars_shift[code];
+		else	   c = chars_neutral[code];		
+		
+		// Si imprimable et défini dans le tableau de caractères
+		if ((c != '\0') && (code <= CHARS_ARRAY_SIZE)) {
+		
+			// Si 'Q' --> arrêt du kernel
+			if (c == 'Q') {
+				printf("\n+----------------------------------------------\n");
+				set_text_color(RED);
+				printf("                 'Q' pressed. \n");
+				printf("             Kernel will now halt.\n");
+				set_text_color(WHITE);
+				printf("+----------------------------------------------\n");
+				halt();
+			}
+		
+			// Ajout dans buffer si non plein
+			if (((buffer_write + 1) % BUFFER_SIZE) != buffer_read) {
+				buffer[buffer_write] = c; 
+				buffer_write = (buffer_write + 1) % BUFFER_SIZE; 
+			}
+			
+		}
+		
 		
 	}
 	
@@ -49,14 +83,13 @@ void keyboard_handler() {
 int getc() {
 
 	// Bloquant si aucun caractère dans le buffer
-	while (index == 0);
+	while (buffer_write == buffer_read);
 	
-	// Lecture des caractères jusqu'à \0
-	printf("%s", buffer);
-	
-	// Réinitialisation buffer
-	memset(&buffer, 0, index);
-	index = 0;
+	// Lecture des caractères jusqu'à ce que buffer_read rattrape buffer_write
+	while (buffer_read != buffer_write) {
+		print_char(buffer[buffer_read]); 
+		buffer_read = (buffer_read + 1) % BUFFER_SIZE;
+	}
 	
 	return 0;
 	
