@@ -97,8 +97,10 @@ void runTests()
     printf("          After the 3 seconds sleep\n");
     printf("+----------------------------------------------\n");
     
-    printf("\nTests are over. Because of the scrolling, you should now see some lines without their numbers on the right.");
+    printf("\nTesting the exception handler by doing a division by zero (the kernel will halt):\n");
+    printf("-----------------------------\n\n");
+    sleep(3000);
 
-	uint8_t a = 10 / 0;
+    uint8_t a = 10 / 0;
 }
 
