@@ -1,8 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 /// \file periph.h
-/// \author Benjamin Ganty
 /// \author Thierry Mourao
-/// \date 4 november 2015
+/// \author Sylvain Thullen
+/// \author Sacha Conti
+/// \date 29 november 2015
 /// \brief Definition of functions to write and read into registers of peripherals.
 ///
 /// Implementation of these functions is made in assembly.

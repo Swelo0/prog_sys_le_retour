@@ -1,9 +1,10 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 /// \file kernel.h
-/// \author Benjamin Ganty
 /// \author Thierry Mourao
-/// \date 4 november 2015
-/// \brief Definition of the main kernel function.
+/// \author Sylvain Thullen
+/// \author Sacha Conti
+/// \date 29 november 2015
+/// \brief Declaration of the kernel main function
 //////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef _KERNEL_H_

@@ -1,9 +1,10 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 /// \file kernel.c
-/// \author Benjamin Ganty
 /// \author Thierry Mourao
-/// \date 4 november 2015
-/// \brief Implementation of the kernel main function.
+/// \author Sylvain Thullen
+/// \author Sacha Conti
+/// \date 29 november 2015
+/// \brief Implementation of the kernel main function
 //////////////////////////////////////////////////////////////////////////////////////////
 
 #include "kernel.h"
@@ -33,7 +34,7 @@ void runKernel()
 	
 	// 100Hz timer
 	printf("| Init Timer ........................ ");
-	timer_init(1000);
+	timer_init(100);
 	
 	// Keyboard
 	printf("| Init Keyboard ..................... ");
@@ -46,19 +47,6 @@ void runKernel()
  
 	// Activation interruptions matérielles
 	sti();
-
-	//Test du sleep
-	printf("\n");
-	printf("+----------------------------------------------\n");
-	printf("          Avant le sleep de 3 secondes\n");
-	printf("+----------------------------------------------\n");
-
-	sleep(3000);
-
-	printf("\n");
-	printf("+----------------------------------------------\n");
-	printf("          Après le sleep de 3 secondes\n");
-	printf("+----------------------------------------------\n");
 	
 	// Tests
     #ifdef TEST

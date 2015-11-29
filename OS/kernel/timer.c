@@ -1,3 +1,12 @@
+//////////////////////////////////////////////////////////////////////////////////////////
+/// \file timer.c
+/// \author Thierry Mourao
+/// \author Sylvain Thullen
+/// \author Sacha Conti
+/// \date 29 november 2015
+/// \brief Implementation of timer functions: PIT initialisation, handler for time interrupt
+//////////////////////////////////////////////////////////////////////////////////////////
+
 #include "timer.h"
 
 static uint ticks = 0;
@@ -50,11 +59,13 @@ void timer_handler() {
 			set_text_color(RED);
 			printf("TICK!!");
 			clignote = false;
+			set_text_color(WHITE);
 		}
 		else{
 			set_text_color(GREEN);
 			printf("TICK!!");
 			clignote = true;
+			set_text_color(WHITE);
 		}
 		set_cursor_offset(backup);		
 	}
@@ -68,15 +79,10 @@ uint get_ticks() {
 void sleep(uint ms) {
 // Ticks à attendre
 	uint wait = (FREQUENCE_MAX / frequence_divise) * (ms / 1000);
-// Message de confirmation
-	printf("\nVariable wait = %d\n", wait);
 // Référence
 	uint ref = ticks;
-	// Message de confirmation
-	printf("\nVariable ref = %d\n", ref);
 // Boucle
 	while (get_ticks() <= (ref + wait)){
 		//printf("%d\n", get_ticks());
 	}
-	printf("Fin du sleep");
 }

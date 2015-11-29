@@ -1,6 +1,6 @@
 ;--------------------------------------------------------------------
 ; File          : periph.s
-; Authors       : Benjamin Ganty, Thierry Mourao
+; Authors       : Thierry Mourao, Sylvain Thullen, Sacha Conti
 ; Date          : 4 november 2014
 ; Description   : Implementation of the read/write functions for peripheral registers.
 ;--------------------------------------------------------------------
