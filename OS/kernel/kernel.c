@@ -33,7 +33,7 @@ void runKernel()
 	
 	// 100Hz timer
 	printf("| Init Timer ........................ ");
-	timer_init(100);
+	timer_init(1000);
 	
 	// Keyboard
 	printf("| Init Keyboard ..................... ");
@@ -43,14 +43,27 @@ void runKernel()
 	printf("+----------------------------------------------\n");
 	printf("          Welcome in our humble kernel.\n");
 	printf("+----------------------------------------------\n");
-	
-	// Tests
-    #ifdef TEST
-		runTests();
-    #endif
  
 	// Activation interruptions matérielles
 	sti();
+
+	//Test du sleep
+	printf("\n");
+	printf("+----------------------------------------------\n");
+	printf("          Avant le sleep de 3 secondes\n");
+	printf("+----------------------------------------------\n");
+
+	sleep(3000);
+
+	printf("\n");
+	printf("+----------------------------------------------\n");
+	printf("          Après le sleep de 3 secondes\n");
+	printf("+----------------------------------------------\n");
+	
+	// Tests
+    #ifdef TEST
+	runTests();
+    #endif
 	
 	// Reading keyboard
     while(1) getc();

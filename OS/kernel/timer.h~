@@ -4,11 +4,11 @@
 #include "../common/types.h"
 #include "periph.h"
 #include "io.h"
-#include "types.h"
 
 extern void timer_init(uint32_t freq_hz);
 extern void timer_handler();
 extern uint get_ticks();
+void set_ticks(uint value);
 extern void sleep(uint ms);
 
 #define FREQUENCE_MAX 1193180 //la fréquence max de l'horloge est de 1'193'180 Hz
