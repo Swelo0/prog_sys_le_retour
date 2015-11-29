@@ -18,7 +18,7 @@
 
 #define KEYBOARD_DATA		0x60
 #define CHARS_ARRAY_SIZE	64
-#define BUFFER_SIZE			50
+#define BUFFER_SIZE			32
 // Special characters
 #define CODE_BACKSPACE		0xE
 #define CODE_LEFT_SHIFT		0x2A
