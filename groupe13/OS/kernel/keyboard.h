@@ -27,6 +27,10 @@
 #define CODE_ALT			0x38
 #define CODE_ALT_GR			0x60
 #define CODE_CTRL			0x1D
+#define CODE_UP				0x48
+#define CODE_DOWN			0x50
+#define CODE_RIGHT			0x4D
+#define CODE_LEFT			0x4B
 
 extern void keyboard_init();
 extern void keyboard_handler();
