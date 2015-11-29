@@ -98,5 +98,7 @@ void runTests()
     printf("+----------------------------------------------\n");
     
     printf("\nTests are over. Because of the scrolling, you should now see some lines without their numbers on the right.");
+
+	uint8_t a = 10 / 0;
 }
 
