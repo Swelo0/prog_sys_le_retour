@@ -28,7 +28,7 @@ void timer_init(uint32_t freq_hz) {
 		printf(" %dHz\n", frequence_divise);
 	}
 // Accès au chan de contrôle: on y écrit 0x36 pour indiquer la sélection du diviseur et le mode “répetition”
-	outb(CHAN_CONTROLE, 0x34);
+	outb(CHAN_CONTROLE, 0x36);
 // On envoie les 8 bits de poids faibles du diviseur
 	outb(CHAN_IRQ, (frequence_divise & 0xFF));
 // On envoie les 8 bits de poids faibles du diviseur
