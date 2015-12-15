@@ -161,13 +161,8 @@ void print_char(char c)
     case '\n':  // Line feed
 		new_cursor_offset = cursor_offset;
 		while ((new_cursor_offset % TEXT_DISPLAY_COLUMNS) != 0) new_cursor_offset++;
-        //new_cursor_offset = cursor_offset + TEXT_DISPLAY_COLUMNS;
+		
         break;
-    /*
-    case '\r':  // Carriage return
-        new_cursor_offset = cursor_offset - (cursor_offset % TEXT_DISPLAY_COLUMNS);
-        break;
-    */
     case '\t':  // Tabulation
         new_cursor_offset = cursor_offset + 8 - (cursor_offset + 8) % 8;
         break;

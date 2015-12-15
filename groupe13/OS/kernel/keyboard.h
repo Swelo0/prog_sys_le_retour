@@ -31,6 +31,14 @@
 #define CODE_DOWN			0x50
 #define CODE_RIGHT			0x4D
 #define CODE_LEFT			0x4B
+// ASCII values
+#define ASCII_BACKSPACE		8
+#define ASCII_LINEFEED		10
+// Unused values to reference the directional arrows' ASCII
+#define ASCII_UP			1024
+#define ASCII_DOWN			1025
+#define ASCII_LEFT			1026
+#define ASCII_RIGHT			1027
 
 extern void keyboard_init();
 extern void keyboard_handler();

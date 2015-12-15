@@ -50,11 +50,12 @@ void runKernel()
 	
 	// Tests
     #ifdef TEST
-	runTests();
+		runTests();
     #endif
 	
-	// Reading keyboard
-    while(1) getc();
+	// Reading keyboard and printing input
+    while (1) 
+		keyboard_print(getc());
 	
 }
 

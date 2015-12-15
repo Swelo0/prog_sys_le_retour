@@ -12,8 +12,6 @@
 static uint ticks = 0;
 // Variable contenant la fréquence divisée
 static uint32_t frequence_divise;
-static bool first = true;
-static bool clignote = true;
 int offset, backup;
 
 void timer_init(uint32_t freq_hz) {
@@ -42,34 +40,6 @@ void timer_init(uint32_t freq_hz) {
 
 void timer_handler() { 
 	ticks++;
-	// Confirmation visuelle
-	#ifndef TEST
-	if(first){
-		backup = get_cursor_offset();
-		set_cursor_position(TEXT_DISPLAY_LINES, TEXT_DISPLAY_COLUMNS - 7);
-		offset = get_cursor_offset();
-		first = false;
-		set_text_color(RED);
-		printf("TICK!!");
-		set_cursor_offset(backup);
-	}else{
-		backup = get_cursor_offset();
-		set_cursor_offset(offset);
-		if(clignote){
-			set_text_color(RED);
-			printf("TICK!!");
-			clignote = false;
-			set_text_color(WHITE);
-		}
-		else{
-			set_text_color(GREEN);
-			printf("TICK!!");
-			clignote = true;
-			set_text_color(WHITE);
-		}
-		set_cursor_offset(backup);		
-	}
-	#endif
 }
 
 uint get_ticks() {
