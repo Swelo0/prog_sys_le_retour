@@ -32,7 +32,7 @@
 #define SECTOR_SIZE     512
 #define SIGNATURE_SIZE  8
 #define FILENAME_SIZE	32
-#define FILE_ENTRY_SIZE 256	// Each entry takes 256 bytes
+#define FILE_ENTRY_SIZE 256
 #define MAX_BLOCKS	 	110	// 256 - (32 + 4) = 220 bytes for blocks indexing
 
 // Block size = sectors_per_block * SECTOR_SIZE
@@ -47,32 +47,28 @@ typedef struct file_entry {
 
 } file_entry;
 
-// attribute(packed) pour empêcher le compilateur de faire du panning
-typedef struct filesystem {
-
-	// Superblock = 28 bytes
-	struct superblock {
+typedef struct superblock {
 
 		char signature[SIGNATURE_SIZE]; 
 		int  sectors_per_block;
 		int  bitmap_size;
+		int  file_entry_nb;
 		int  file_entry_size;
-		int  file_entry_blocks;
-		int  file_content_size;
+		int  data_blocks;
 
-	} sb __attribute__((packed));
+} superblock;
+
+// attribute(packed) pour empêcher le compilateur de faire du padding
+typedef struct filesystem {
+
+	superblock sb;
 
 	int* bitmap;
 
-	int* fe; //  __attribute__((packed));
+	int* fe;
 
 	int* fc;
 		
 } filesystem;
-
-int  pfscreate(char* img_p, int block_size, int file_entries_num, int data_blocks);
-void pfslist(filesystem *fs);
-void pfsadd (filesystem *fs, char file[]);
-void pfsdel (filesystem *fs, char file[]);
 
 #endif

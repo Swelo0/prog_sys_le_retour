@@ -1,58 +1,55 @@
-// !!!
-// 		Bitmap        : all bytess    != 0
-// 		File entries  : bytes [0..11] != 0
-//		File contents : nothing written in fs.img
-// !!!
-
 #include "fs.h"
 
+// Error constants
 #define SYNTAX_ERROR 1
 #define IO_ERROR	 2
 #define RANGE_ERROR  3
 
-// File system structure
-filesystem fs;
+// Zero constant (1 byte)
+const char zero = 0;
+
 // File system image
 char* img;
+// File system image handler
+FILE* file;
 
-// Creates and inits a PFS structure 
+// Writes a PFS structure into the specified image file
 int pfscreate(char* img_p, int block_size, int file_entries_num, int data_blocks) {
 	
-		int i, j;
-	
-		// Ouput image filename
-		img = img_p;
-	
-		// Superblock init and copy
-		strcpy(fs.sb.signature,    "PFSv0100");
-		fs.sb.sectors_per_block  = (block_size / SECTOR_SIZE);
-		fs.sb.bitmap_size        = 1;
-		fs.sb.file_entry_size    = FILE_ENTRY_SIZE;
-		fs.sb.file_entry_blocks  = file_entries_num;
-		fs.sb.file_content_size  = data_blocks;
+		// Superblock init
+		superblock sb;
+		strcpy(sb.signature,   "PFSv0100");
+		sb.sectors_per_block = (block_size / SECTOR_SIZE);
+		sb.bitmap_size       = 1;
+		sb.file_entry_size   = FILE_ENTRY_SIZE;
+		sb.file_entry_nb     = file_entries_num;
+		sb.data_blocks       = data_blocks;
 		
-		// Bitmap init
-		char* bitmap = malloc(sizeof(char) * (data_blocks / 8));
-		memset(bitmap, 0, sizeof(char) * (data_blocks / 8));
-		
-		// File entries init
-		file_entry* fe[file_entries_num];
-		for (i = 0; i < file_entries_num; i++) {
-			fe[i] = malloc(sizeof(file_entry));
-			fe[i]->size = 0 ;
-			for (j = 0; j < FILENAME_SIZE; j++) fe[i]->name[j]   = 0;
-			for (j = 0; j < MAX_BLOCKS; j++)    fe[i]->blocks[j] = 0;
+		// Open image file
+		file = fopen(img, "wb");
+		if (file == NULL) {
+			printf("I/O error ! File %s could not be accessed.\n", img);
+			return IO_ERROR;
 		}
 		
-		// File contents init
-		char* fc = malloc(sizeof(char) * block_size * data_blocks);
-		memset(fc, 0, (sizeof(char) * block_size * data_blocks));
+		// Superblock (1 block)
+		fwrite(&sb, sizeof(superblock), 1, file);
+		for (int i = 0; i < (block_size - sizeof(superblock)); i++)
+			fwrite(&zero, sizeof(char), 1, file);
+		// Bitmap (1 block minimum)
+		for (int i = 0; i < (data_blocks / 8); i++)
+			fwrite(&zero, sizeof(char), 1, file);
+		for (int i = (data_blocks / 8); i < block_size; i++)
+			fwrite(&zero, sizeof(char), 1, file);
+		// File entries
+		for (int i = 0; i < (file_entries_num * sb.file_entry_size); i++)
+			fwrite(&zero, sizeof(char), 1, file);
+		// Data blocks
+		for (int i = 0; i < (data_blocks * block_size); i++)
+			fwrite(&zero, sizeof(char), 1, file);
 		
-		// Copy into structure
-		fs.bitmap = (int*) &bitmap;
-		fs.fc = (int*) &fc;
-		fs.fe = (int*) &fe;
-
+		// End of routine
+		fclose(file);
 		return 0;
 		
 }
@@ -68,11 +65,6 @@ int main(int argc, char** argv) {
 		
 	// Image file creation
 	img = argv[1];
-	FILE * file = fopen(img, "wb");
-	if (file == NULL) {
-		printf("I/O error ! File %s could not be accessed.\n", img);
-		return IO_ERROR;
-	}
 	
 	// Arguments check
 	int block_size = atoi(argv[2]);
@@ -92,18 +84,6 @@ int main(int argc, char** argv) {
 	}
 	
 	// Filesystem structure init
-	pfscreate(img, block_size, file_entries, data_blocks);
-	
-	// Structure copy into image file
-	fwrite(&fs.sb,     sizeof(struct superblock), 1,                          file);
-	fwrite(&fs.bitmap, sizeof(char),              (data_blocks / 8),          file); 
-	fwrite(&fs.fe,     sizeof(struct file_entry), file_entries,               file);
-	fwrite(&fs.fc,     sizeof(char),              (data_blocks * block_size), file);
-	
-	// Close file
-	fclose(file);
-		
-	// End of routine
-	return 0;
+	return pfscreate(img, block_size, file_entries, data_blocks);
 	
 }

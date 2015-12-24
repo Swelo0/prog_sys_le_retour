@@ -1,5 +1,6 @@
 # Compiler
 CC=gcc
+CFLAGS=-std=c99
 
 # File system image
 IMG=fs.img
@@ -12,20 +13,21 @@ LIST=pfslist
 
 # Arguments
 BLOCK_SIZE=1024
-FILE_ENTRIES=1
-DATA_BLOCKS=64
+FILE_ENTRIES=16
+DATA_BLOCKS=128
 
 all:
-	$(CC) $(CREATE).c -o $(CREATE)
-#	$(CC) $(ADD).c -o $(ADD)
-#	$(CC) $(DELETE).c -o $(DELETE)
-#	$(CC) $(LIST).c -o $(LIST)
+	$(CC) $(CFLAGS) $(CREATE).c -o $(CREATE)
+#	$(CC) $(CFLAGS) $(ADD).c -o $(ADD)
+#	$(CC) $(CFLAGS) $(DELETE).c -o $(DELETE)
+#	$(CC) $(CFLAGS) $(LIST).c -o $(LIST)
 
 create: $(CREATE)
+	clear
 	./$(CREATE) $(IMG) $(BLOCK_SIZE) $(FILE_ENTRIES) $(DATA_BLOCKS)
 	
 look: $(IMG)
-	hexdump $(IMG)
+	hexedit $(IMG)
 	
 clean:
 	rm $(IMG) $(CREATE)
