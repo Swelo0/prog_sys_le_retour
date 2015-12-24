@@ -30,5 +30,5 @@ look: $(IMG)
 	hexedit $(IMG)
 	
 clean:
-	rm $(IMG) $(CREATE)
+	rm $(IMG)
 	
