@@ -11,14 +11,17 @@ ADD=pfsadd
 DELETE=pfsdel
 LIST=pfslist
 
-# Arguments
+# Creation arguments
 BLOCK_SIZE=1024
 FILE_ENTRIES=16
 DATA_BLOCKS=128
 
+# Add arguments
+INPUT=example.txt
+
 all:
 	$(CC) $(CFLAGS) $(CREATE).c -o $(CREATE)
-#	$(CC) $(CFLAGS) $(ADD).c -o $(ADD)
+	$(CC) $(CFLAGS) $(ADD).c -o $(ADD)
 #	$(CC) $(CFLAGS) $(DELETE).c -o $(DELETE)
 #	$(CC) $(CFLAGS) $(LIST).c -o $(LIST)
 
@@ -26,8 +29,9 @@ create: $(CREATE)
 	clear
 	./$(CREATE) $(IMG) $(BLOCK_SIZE) $(FILE_ENTRIES) $(DATA_BLOCKS)
 	
-look: $(IMG)
-	hexedit $(IMG)
+add: $(ADD)
+	clear
+	./$(ADD) $(IMG) $(INPUT)
 	
 clean:
 	rm $(IMG)

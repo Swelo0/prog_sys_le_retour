@@ -29,15 +29,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SECTOR_SIZE     512
-#define SIGNATURE_SIZE  8
-#define FILENAME_SIZE	32
-#define FILE_ENTRY_SIZE 256
-#define MAX_BLOCKS	 	110	// 256 - (32 + 4) = 220 bytes for blocks indexing
+// Filesystem constants
+#define SECTOR_SIZE       512
+#define SIGNATURE_SIZE    8
+#define FILENAME_SIZE	  32
+#define FILE_ENTRY_SIZE   256
+#define MAX_BLOCKS	 	  110	// 256 - (32 + 4) = 220 bytes for blocks indexing = 110 indexes
 
-// Block size = sectors_per_block * SECTOR_SIZE
-// File_entry_blocks = number of file entries
-// File_content_size = number of data blocks
+// General error constants
+#define NO_ERROR          0
+#define SYNTAX_ERROR      1
+#define IO_ERROR	      2
+#define RANGE_ERROR       3
+// Specific error constants
+#define FULL_FE_ERROR     4
+#define FULL_BITMAP_ERROR 5
+
+// Zero constant (1 byte)
+const char zero = 0;
 
 typedef struct file_entry {
 
@@ -45,7 +54,7 @@ typedef struct file_entry {
 		int   size;
 		short blocks[MAX_BLOCKS];
 
-} file_entry;
+} file_entry __attribute__((packed));
 
 typedef struct superblock {
 
@@ -56,19 +65,6 @@ typedef struct superblock {
 		int  file_entry_size;
 		int  data_blocks;
 
-} superblock;
-
-// attribute(packed) pour empêcher le compilateur de faire du padding
-typedef struct filesystem {
-
-	superblock sb;
-
-	int* bitmap;
-
-	int* fe;
-
-	int* fc;
-		
-} filesystem;
+} superblock __attribute__((packed));
 
 #endif

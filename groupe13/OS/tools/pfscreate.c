@@ -1,13 +1,5 @@
 #include "fs.h"
 
-// Error constants
-#define SYNTAX_ERROR 1
-#define IO_ERROR	 2
-#define RANGE_ERROR  3
-
-// Zero constant (1 byte)
-const char zero = 0;
-
 // File system image
 char* img;
 // File system image handler
@@ -26,8 +18,7 @@ int pfscreate(char* img_p, int block_size, int file_entries_num, int data_blocks
 		sb.data_blocks       = data_blocks;
 		
 		// Open image file
-		file = fopen(img, "wb");
-		if (file == NULL) {
+		if (!(file = fopen(img, "wb"))) {
 			printf("I/O error ! File %s could not be accessed.\n", img);
 			return IO_ERROR;
 		}
@@ -50,7 +41,7 @@ int pfscreate(char* img_p, int block_size, int file_entries_num, int data_blocks
 		
 		// End of routine
 		fclose(file);
-		return 0;
+		return NO_ERROR;
 		
 }
 

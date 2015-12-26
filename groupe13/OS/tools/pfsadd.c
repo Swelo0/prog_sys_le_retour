@@ -1,63 +1,148 @@
 #include "fs.h"
 
-// Ajout
-void pfsadd(filesystem *fs, char fileName[]) {
+// File handler
+FILE* img_file;
+FILE* input_file;
 
-	FILE* fp;
-	block blockTemp;
-	int   ptByte = 0;
-	int64*  ptBitmap =(int64*)(&(*fs).bitmap);
-	char  ch;
-	int	  fileLen, numEntry, currentBlock = 0, numBlock = 0;
-	
-	// Mode lecture
-	fp = fopen(fileName,"r"); 
-	
-	if( fp == NULL ) perror("Error while opening the file.\n");
-	
-	// On trouve une entrée libre.
-	numEntry = -1;
-	while ((*fs).fe[++numEntry].name[0] != '\0');
-	strcpy((*fs).fe[numEntry].name, fileName);
-	
-	// Longueur du fichier
-	fseek(fp, 0, SEEK_END);
-	// Nombre de bytes dans le fichier	
-	fileLen=ftell(fp); 
-	fseek(fp, 0, SEEK_SET);
-	
-	(*fs).fe[numEntry].size = fileLen;
-	
-	int i=0;
-	// On parcourt le fichier par block (1024o) 
-	for (i=0;i<(fileLen/BLOCK_SIZE);i++) {
-		fread( blockTemp , BLOCK_SIZE , 1 , fp );
-		// On met a jour le Bitmap et écrit les données, writeBlock(...)
-		// On trouve un block libre
-		while ((*ptBitmap)&1<<(numBlock++)); 
-		// Mise à jour de Bitmap
-		(*ptBitmap) |= 1<<(numBlock-1); 
-		// Ecrit 2
-		(*fs).fe[numEntry].blocks[currentBlock++] = numBlock; 
-		// Si le deuxième block est libre (donc réellement le bloc[1])
-		memmove((*fs).fc[numBlock], blockTemp, BLOCK_SIZE);
+// Ajout
+int pfsadd(char* img, char* input) {
+
+	// Open files
+	if (!(img_file = fopen(img, "r+"))) {
+		printf("I/O error ! File %s could not be accessed.\n", img);
+		return IO_ERROR;
+	}
+	if (!(input_file = fopen(input, "r"))) {
+		printf("I/O error ! File %s could not be accessed.\n", input);
+		return IO_ERROR;
 	}
 	
-	// Quand il reste moins de 1024o de données à écrire. 
-	while( ( ch = fgetc(fp) ) != EOF ) blockTemp[ptByte++] = ch;
-	blockTemp[ptByte] = '\0'; //fin du fichier
+	// Read image and extract Superblock infos (28 bytes)
+	superblock sb;
+	fread(&sb, sizeof(char), sizeof(superblock), img_file);
+	int block_size = sb.sectors_per_block * SECTOR_SIZE;
 	
-	// On met a jour le Bitmap et écrit les données, writeBlock(...)
-	numBlock = 0;
-	// On trouve un block libre
-	while ((*ptBitmap)&1<<(numBlock++)); 
-	// Mise à jour de bitmap
-	(*ptBitmap) |= 1<<(numBlock-1); 
-	// Ecrit 2
-	(*fs).fe[numEntry].blocks[currentBlock++] = numBlock; 
-	// Si le deuxième block est libre (donc réellement le bloc[1])
-	memmove((*fs).fc[numBlock], blockTemp, BLOCK_SIZE);
+	// Block type definition
+	typedef char block[block_size];
 	
-        fclose(fp);
+	// Rest of the filesystem structure
+	block bitmap, fc[sb.data_blocks];
+	file_entry fe[sb.file_entry_nb];
+	
+	// Read the rest of the file
+	fread(&sb + sizeof(superblock), sizeof(char),       block_size - sizeof(superblock), img_file); 
+	fread(&bitmap,                  sizeof(char),       block_size,                      img_file);
+	fread(&fe,                      sizeof(file_entry), sb.file_entry_nb,                img_file);
+	fread(&fc,                      block_size,         sb.data_blocks,                  img_file);
+	
+	// Look for a free file entry
+	int entry = -1;
+	for (int i = 0; i < sb.file_entry_nb; i++)
+		if (!fe[i].name[0]) {
+			entry = i;
+			break;
+		}
+	// Entry check
+	if (entry >= 0)
+		strcpy(fe[entry].name, input);  
+	else {
+		printf("Error : no more available file entry.\n");
+		return FULL_FE_ERROR;
+	}
+	printf("File entry id : %d\n", entry);
+	
+	// File size (bytes)
+	fseek(input_file, 0, SEEK_END);
+	int file_size = ftell(input_file); 
+	fseek(input_file, 0, SEEK_SET);
+	fe[entry].size = file_size;
+	
+	// Parse file block by block
+	block tmp;
+	int blockNum     = -1;
+	int currentBlock = 0;
+	for (int i = 0; i <= (file_size / block_size); i++) {
+		
+		// Read block
+		memset(tmp, 0, block_size);
+		if (i != (file_size / block_size))
+			fread(tmp, block_size , 1, input_file);
+		
+		// Last portion is potentially not a whole block so we copy it byte per byte
+		else {			
+			char c;
+			int b = 0;
+			while ((c = fgetc(input_file)) != EOF) tmp[b++] = c;
+		}
+	
+		// Look for a free block in the bitmap
+		int offset = 0;
+		int ok     = 0;
+		while ((offset < (sb.data_blocks / 8)) && (!ok)) {
+			
+			blockNum = -1;
+			for (int i = 0; i < 8; i++)
+				// As soon as we find a 0 bit we stop
+				if (!(*(bitmap + offset) & (1 << (++blockNum)))) {
+					ok = 1;
+					break;
+				}
+			if (!ok) offset++;
+			
+		}
+		// If no free block found
+		if (!ok) {
+			printf("Error : no more available data block.\n");
+			return FULL_BITMAP_ERROR;
+		}
+		
+		// Update filesystem structure
+		*(bitmap + offset) |= 1 << blockNum; 
+		fe[entry].blocks[currentBlock++] = (offset * 8) + blockNum; 
+		memcpy(fc[(offset * 8) + blockNum], &tmp, block_size);
+		
+		// Display
+		printf("Data block[%d] : %d\nBitmap        :\n", currentBlock, (offset * 8) + blockNum);
+		for (int i = 0; i < (sb.data_blocks / 8); i++) {
+			printf("%2d | ", i);
+			for (int j = 0; j < 8; j++) {
+				if (*(bitmap+i) & (1 << j)) printf("1 ");
+				else printf("0 ");
+			}
+			printf("\n");
+		}
+		
+	}
+	
+	// Overwrite existing image with filesystem structure
+	fclose(img_file);
+	if (!(img_file = fopen(img, "w+"))) {
+		printf("I/O error ! File %s could not be accessed.\n", img);
+		return IO_ERROR;
+	}
+	fwrite(&sb,     sizeof(char),       block_size,       img_file);
+	fwrite(&bitmap, sizeof(char),       block_size,       img_file);
+	fwrite(&fe,     sb.file_entry_size, sb.file_entry_nb, img_file);
+	fwrite(&fc,     block_size,         sb.data_blocks,   img_file);
+	
+	// Close files
+	fclose(img_file);
+	fclose(input_file);
+	
+	// End of routine
+	return NO_ERROR;
     
+}
+
+int main(int argc, char** argv) {
+
+	// Arguments check
+	if (argc < 3) {
+		printf("Syntax error ! Usage : %s <filesystem_image> <input_file>\n", argv[0]);
+		return SYNTAX_ERROR;
+	}
+	
+	// Add file to the filesystem
+	return pfsadd(argv[1], argv[2]);
+	
 }
