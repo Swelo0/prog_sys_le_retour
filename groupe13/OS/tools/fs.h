@@ -30,20 +30,21 @@
 #include <string.h>
 
 // Filesystem constants
-#define SECTOR_SIZE       512
-#define SIGNATURE_SIZE    8
-#define FILENAME_SIZE	  32
-#define FILE_ENTRY_SIZE   256
-#define MAX_BLOCKS	 	  110	// 256 - (32 + 4) = 220 bytes for blocks indexing = 110 indexes
+#define SECTOR_SIZE          512
+#define SIGNATURE_SIZE       8
+#define FILENAME_SIZE	     32
+#define FILE_ENTRY_SIZE      256
+#define MAX_BLOCKS	 	     110	// 256 - (32 + 4) = 220 bytes for blocks indexing = 110 indexes
 
 // General error constants
-#define NO_ERROR          0
-#define SYNTAX_ERROR      1
-#define IO_ERROR	      2
-#define RANGE_ERROR       3
+#define NO_ERROR             0
+#define SYNTAX_ERROR         1
+#define IO_ERROR	         2
+#define RANGE_ERROR          3
 // Specific error constants
-#define FULL_FE_ERROR     4
-#define FULL_BITMAP_ERROR 5
+#define FULL_FE_ERROR        4
+#define FULL_BITMAP_ERROR    5
+#define FILE_NOT_FOUND_ERROR 6
 
 // Zero constant (1 byte)
 const char zero = 0;

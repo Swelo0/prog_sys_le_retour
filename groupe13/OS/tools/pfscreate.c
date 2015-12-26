@@ -5,7 +5,7 @@ char* img;
 // File system image handler
 FILE* file;
 
-// Writes a PFS structure into the specified image file
+// Write a PFS structure into the specified image file
 int pfscreate(char* img_p, int block_size, int file_entries_num, int data_blocks) {
 	
 		// Superblock init

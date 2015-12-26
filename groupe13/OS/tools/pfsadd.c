@@ -1,10 +1,10 @@
 #include "fs.h"
 
-// File handler
+// File handlers
 FILE* img_file;
 FILE* input_file;
 
-// Ajout
+// Add file to filesystem image
 int pfsadd(char* img, char* input) {
 
 	// Open files
@@ -60,7 +60,7 @@ int pfsadd(char* img, char* input) {
 	// Parse file block by block
 	block tmp;
 	int blockNum     = -1;
-	int currentBlock = 0;
+	int currentBlock = -1;
 	for (int i = 0; i <= (file_size / block_size); i++) {
 		
 		// Read block
@@ -82,11 +82,12 @@ int pfsadd(char* img, char* input) {
 			
 			blockNum = -1;
 			for (int i = 0; i < 8; i++)
-				// As soon as we find a 0 bit we stop
-				if (!(*(bitmap + offset) & (1 << (++blockNum)))) {
-					ok = 1;
-					break;
-				}
+				// As soon as we find a 0 bit we stop (not the index 0 though)
+				if (!(*(bitmap + offset) & (1 << (++blockNum))))
+					if ((offset != 0) || (blockNum != 0)) {
+						ok = 1;
+						break;
+					}
 			if (!ok) offset++;
 			
 		}
@@ -98,20 +99,23 @@ int pfsadd(char* img, char* input) {
 		
 		// Update filesystem structure
 		*(bitmap + offset) |= 1 << blockNum; 
-		fe[entry].blocks[currentBlock++] = (offset * 8) + blockNum; 
+		fe[entry].blocks[++currentBlock] = (offset * 8) + blockNum; 
 		memcpy(fc[(offset * 8) + blockNum], &tmp, block_size);
 		
 		// Display
-		printf("Data block[%d] : %d\nBitmap        :\n", currentBlock, (offset * 8) + blockNum);
-		for (int i = 0; i < (sb.data_blocks / 8); i++) {
-			printf("%2d | ", i);
-			for (int j = 0; j < 8; j++) {
-				if (*(bitmap+i) & (1 << j)) printf("1 ");
-				else printf("0 ");
-			}
-			printf("\n");
-		}
+		printf("Data block[%d] : %d\n", currentBlock, (offset * 8) + blockNum);
 		
+	}
+
+	// Display
+	printf("Bitmap        :\n");
+	for (int i = 0; i < (sb.data_blocks / 8); i++) {
+		printf("%2d | ", i);
+		for (int j = 0; j < 8; j++) {
+			if (*(bitmap+i) & (1 << j)) printf("1 ");
+			else printf("0 ");
+		}
+		printf("\n");
 	}
 	
 	// Overwrite existing image with filesystem structure

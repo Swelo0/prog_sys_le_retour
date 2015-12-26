@@ -22,7 +22,7 @@ INPUT=example.txt
 all:
 	$(CC) $(CFLAGS) $(CREATE).c -o $(CREATE)
 	$(CC) $(CFLAGS) $(ADD).c -o $(ADD)
-#	$(CC) $(CFLAGS) $(DELETE).c -o $(DELETE)
+	$(CC) $(CFLAGS) $(DELETE).c -o $(DELETE)
 #	$(CC) $(CFLAGS) $(LIST).c -o $(LIST)
 
 create: $(CREATE)
@@ -32,6 +32,10 @@ create: $(CREATE)
 add: $(ADD)
 	clear
 	./$(ADD) $(IMG) $(INPUT)
+
+delete: $(DELETE)
+	clear
+	./$(DELETE) $(IMG) $(INPUT)
 	
 clean:
 	rm $(IMG)
