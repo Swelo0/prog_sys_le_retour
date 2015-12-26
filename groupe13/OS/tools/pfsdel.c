@@ -65,16 +65,13 @@ int pfsdel(char* img, char* input) {
 		// Zero corresponding file entry 
 		memset(&fe[entry], 0, sb.file_entry_size);
 			
-		int b = -1;
-		while ((fe[entry].blocks[++b] != 0) && (b < MAX_BLOCKS)) fe[entry].blocks[b] = 0;
-		
 	}
-	else {
+	else if (entry >= 0) {
 		printf("Error ! File %s not found.\n", input);
 		return FILE_NOT_FOUND_ERROR;
 	}
 	
-	// Display
+	/* Display
 	printf("Bitmap        :\n");
 	for (int i = 0; i < (sb.data_blocks / 8); i++) {
 		printf("%2d | ", i);
@@ -84,6 +81,7 @@ int pfsdel(char* img, char* input) {
 		}
 		printf("\n");
 	}
+	*/
 	
 	// Overwrite existing image with filesystem structure
 	fclose(img_file);

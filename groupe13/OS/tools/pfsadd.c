@@ -40,10 +40,8 @@ int pfsadd(char* img, char* input) {
 	for (int i = 0; i < sb.file_entry_nb; i++)
 		if (!fe[i].name[0]) {
 			entry = i;
-			printf("entry1 = %d\n", entry);
 			break;
 		}
-	printf("entry2 = %d\n", entry);
 	// Entry check
 	if (entry >= 0)
 		strcpy(fe[entry].name, input);  
@@ -51,7 +49,6 @@ int pfsadd(char* img, char* input) {
 		printf("Error : no more available file entry.\n");
 		return FULL_FE_ERROR;
 	}
-	printf("entry3 = %d\n", entry);
 	printf("File entry id : %d\n", entry);
 	
 	// File size (bytes)
@@ -110,7 +107,7 @@ int pfsadd(char* img, char* input) {
 		
 	}
 
-	// Display
+	/* Display
 	printf("Bitmap        :\n");
 	for (int i = 0; i < (sb.data_blocks / 8); i++) {
 		printf("%2d | ", i);
@@ -120,13 +117,17 @@ int pfsadd(char* img, char* input) {
 		}
 		printf("\n");
 	}
+	*/
 	
 	// Overwrite existing image with filesystem structure
 	fclose(img_file);
+	printf("Attempting to open %s ... ", img);
+	img_file = fopen(img, "w+");
+	printf("ok (%d)\n", img_file);/*
 	if (!(img_file = fopen(img, "w+"))) {
 		printf("I/O error ! File %s could not be accessed.\n", img);
 		return IO_ERROR;
-	}
+	}*/
 	fwrite(&sb,     sizeof(char),       block_size,       img_file);
 	fwrite(&bitmap, sizeof(char),       block_size,       img_file);
 	fwrite(&fe,     sb.file_entry_size, sb.file_entry_nb, img_file);
