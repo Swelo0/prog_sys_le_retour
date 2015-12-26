@@ -40,8 +40,10 @@ int pfsadd(char* img, char* input) {
 	for (int i = 0; i < sb.file_entry_nb; i++)
 		if (!fe[i].name[0]) {
 			entry = i;
+			printf("entry1 = %d\n", entry);
 			break;
 		}
+	printf("entry2 = %d\n", entry);
 	// Entry check
 	if (entry >= 0)
 		strcpy(fe[entry].name, input);  
@@ -49,6 +51,7 @@ int pfsadd(char* img, char* input) {
 		printf("Error : no more available file entry.\n");
 		return FULL_FE_ERROR;
 	}
+	printf("entry3 = %d\n", entry);
 	printf("File entry id : %d\n", entry);
 	
 	// File size (bytes)
@@ -138,6 +141,7 @@ int pfsadd(char* img, char* input) {
     
 }
 
+// Entry point
 int main(int argc, char** argv) {
 
 	// Arguments check

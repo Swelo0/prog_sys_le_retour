@@ -32,18 +32,19 @@ int pfsdel(char* img, char* input) {
 	
 	// Look for the specified file entry
 	int entry = -1;
+	int ok    = 0;
 	for (int i = 0; i < sb.file_entry_nb; i++)
-		if (!strcmp(fe[++entry].name, input)) {
+		if ((strcmp(fe[++entry].name, input)) == 0) {
 			entry = i;
+			ok = 1;
 			break;
 		}
-		else printf("%s != %s\n", fe[entry].name, input);
 	
 	// Entry update
 	int currentBlock = -1;
 	int deleteBlock  = -1;
 	int offset, blockNum;
-	if (entry >= 0) {
+	if ((ok) && (entry >= 0)) {
 	
 		printf("File entry id : %d\n", entry);
 	
@@ -56,14 +57,14 @@ int pfsdel(char* img, char* input) {
 			*(bitmap + offset) &= (!(1 << blockNum));
 			// Zero corresponding block in file content
 			memset(fc[offset * 8 + blockNum], 0, block_size);
-			// Zero corresponding file entry 
-			memset(&fe[entry], 0, sb.file_entry_size);
 			
 			printf("Data Block[%d] : %d\n", currentBlock, deleteBlock);
 			
 		}
+		
+		// Zero corresponding file entry 
+		memset(&fe[entry], 0, sb.file_entry_size);
 			
-		memset(&fe[entry], 0, sizeof(char) * FILENAME_SIZE + sizeof(int));
 		int b = -1;
 		while ((fe[entry].blocks[++b] != 0) && (b < MAX_BLOCKS)) fe[entry].blocks[b] = 0;
 		
@@ -84,12 +85,34 @@ int pfsdel(char* img, char* input) {
 		printf("\n");
 	}
 	
+	// Overwrite existing image with filesystem structure
+	fclose(img_file);
+	if (!(img_file = fopen(img, "w+"))) {
+		printf("I/O error ! File %s could not be accessed.\n", img);
+		return IO_ERROR;
+	}
+	fwrite(&sb,     sizeof(char),       block_size,       img_file);
+	fwrite(&bitmap, sizeof(char),       block_size,       img_file);
+	fwrite(&fe,     sb.file_entry_size, sb.file_entry_nb, img_file);
+	fwrite(&fc,     block_size,         sb.data_blocks,   img_file);
+	
+	// Close files
+	fclose(img_file);
+	
 	return NO_ERROR;
 	
 }
 
+// Entry point
 int main(int argc, char** argv) {
 	
+	// Arguments check
+	if (argc < 3) {
+		printf("Syntax Error ! Usage : %s <filesystem_image> <input_file>\n", argv[0]);
+		return SYNTAX_ERROR;
+	}
+	
+	// Delete file from filesystem
 	return pfsdel(argv[1], argv[2]);
 	
 }
