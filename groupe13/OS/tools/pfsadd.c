@@ -121,13 +121,10 @@ int pfsadd(char* img, char* input) {
 	
 	// Overwrite existing image with filesystem structure
 	fclose(img_file);
-	printf("Attempting to open %s ... ", img);
-	img_file = fopen(img, "w+");
-	printf("ok (%d)\n", img_file);/*
 	if (!(img_file = fopen(img, "w+"))) {
 		printf("I/O error ! File %s could not be accessed.\n", img);
 		return IO_ERROR;
-	}*/
+	}
 	fwrite(&sb,     sizeof(char),       block_size,       img_file);
 	fwrite(&bitmap, sizeof(char),       block_size,       img_file);
 	fwrite(&fe,     sb.file_entry_size, sb.file_entry_nb, img_file);

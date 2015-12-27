@@ -1,14 +1,16 @@
 # Compiler
 CC=gcc
-CFLAGS=-std=c99
+CFLAGS=-std=c99 -Wall
 
 # File system image
 IMG=fs.img
+# Input file
+INPUT=example.txt
 
 # Tools
 CREATE=pfscreate
 ADD=pfsadd
-DELETE=pfsdel
+DEL=pfsdel
 LIST=pfslist
 
 # Creation arguments
@@ -16,14 +18,11 @@ BLOCK_SIZE=1024
 FILE_ENTRIES=16
 DATA_BLOCKS=128
 
-# Add arguments
-INPUT=example.txt
-
 all:
 	$(CC) $(CFLAGS) $(CREATE).c -o $(CREATE)
-	$(CC) $(CFLAGS) $(ADD).c -o $(ADD)
-	$(CC) $(CFLAGS) $(DELETE).c -o $(DELETE)
-#	$(CC) $(CFLAGS) $(LIST).c -o $(LIST)
+	$(CC) $(CFLAGS) $(ADD).c    -o $(ADD)
+	$(CC) $(CFLAGS) $(DEL).c    -o $(DEL)
+	$(CC) $(CFLAGS) $(LIST).c   -o $(LIST)
 
 create: $(CREATE)
 	clear
@@ -33,9 +32,13 @@ add: $(ADD)
 	clear
 	./$(ADD) $(IMG) $(INPUT)
 
-delete: $(DELETE)
+delete: $(DEL)
 	clear
-	./$(DELETE) $(IMG) $(INPUT)
+	./$(DEL) $(IMG) $(INPUT)
+
+list: $(LIST)
+	clear
+	./$(LIST) $(IMG)
 	
 clean:
 	rm $(IMG)

@@ -55,7 +55,7 @@ typedef struct file_entry {
 		int   size;
 		short blocks[MAX_BLOCKS];
 
-} file_entry __attribute__((packed));
+} __attribute__((packed)) file_entry ;
 
 typedef struct superblock {
 
@@ -66,6 +66,6 @@ typedef struct superblock {
 		int  file_entry_size;
 		int  data_blocks;
 
-} superblock __attribute__((packed));
+} __attribute__((packed)) superblock;
 
 #endif
