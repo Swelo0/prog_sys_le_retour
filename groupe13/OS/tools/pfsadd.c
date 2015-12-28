@@ -54,8 +54,10 @@ int pfsadd(char* img, char* input) {
 	// File size (bytes)
 	fseek(input_file, 0, SEEK_END);
 	int file_size = ftell(input_file); 
-	fseek(input_file, 0, SEEK_SET);
 	fe[entry].size = file_size;
+	
+	// Reset file pointer
+	fseek(input_file, 0, SEEK_SET);
 	
 	// Parse file block by block
 	block tmp;

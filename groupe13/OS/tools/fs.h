@@ -1,26 +1,11 @@
-/*----------------------------------------------------------------------
- * 					Système de fichier (version linux)
- * 	Fonctionnalité :
- * 		-pfscreate: Initialise notre système de fichier.
- * 		-pfsadd   : Permet d'ajouter un fichier au système,
- * 					on chercher une entrée libre dans le file entry pour
- * 					notre fichier et on l'écris en blocks dans le file 
- * 					content, le bitmap est mis à jour en parrallèle.
- * 
- * 		-pfsdel   : Met simplement à 0 le premier caractère du file 
- * 					entry de notre fichier ainsi que les bitmap qui le
- * 					concerne
- * 
- *  Remarques :  /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ 
- * 
- * 				Le premier bloc du content (qui à la valeur 0 en c)
- * 				est considéré comme le 1 ici. Ainsi si dans notre file
- * 				entry, notre fichier est dans le block [1], en réalité
- * 				c'est le block [0] en mémoire.
- * 				exemple :
- * 						fileEntry[1].blocks[1] == fileContent[0]
- * 
- * -------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------
+ *  Remarque : 	Le data block 0 n'est pas utilisé, car les bloc
+ *				référencés dans les file entries sont initialisés à zéro
+ *				et servent de valeur de test pour vérifier si un bloc
+ *				est défini ou pas. Par conséquent, si le paramètre 
+ *				data block passé à la création de l'image vaut n, il y
+ *				aura en fait (n - 1) blocs utilisables pour les file contents.
+ * ----------------------------------------------------------------------------*/
 
 #ifndef H_FS_
 #define H_FS_
