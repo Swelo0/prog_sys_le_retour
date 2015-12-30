@@ -53,7 +53,14 @@ void runKernel()
 		runTests();
     #endif
     
-    file_iterator();
+	stat_t* s;
+	char* file = "example.txt";
+	if (file_exists(file)) {
+		file_stat("example.txt", s);
+		printf("File:\n   name : %s\n   size : %d bytes\n", s->name, s->size);
+	}
+	else
+		printf("File %s doesn't exist\n", file);
 	
 	// Reading keyboard and printing input
     while (1) 
