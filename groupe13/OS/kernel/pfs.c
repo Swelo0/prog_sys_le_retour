@@ -95,7 +95,7 @@ file_iterator_t file_iterator(){
 	memcpy(&sizedatablocks,sb+24,sizeof(int32_t));
 	
 	it.nb_file_entries = nbfileentries;
-	it.index = 0;
+	it.index = -1;
 	it.first = sizeblock+(sizebitemap*sizeblock);
 	
 	
