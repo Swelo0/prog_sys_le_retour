@@ -16,7 +16,7 @@ int strcmp (const char* s1, const char* s2)
     return *(const unsigned char*)s1-*(const unsigned char*)s2;
 }
 
-int file_stat(char *filename, stat_t *stat){
+int file_stat(char *filename/*, stat_t *stat*/){
 	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
@@ -29,7 +29,7 @@ int file_stat(char *filename, stat_t *stat){
 	return -1;
 }
 
-int file_read(char *filename, void *buf){
+int file_read(char *filename/*, void *buf*/){
 	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
@@ -72,9 +72,9 @@ int file_exists(char *filename){
  */
 file_iterator_t file_iterator(){
 	char sb[512];
-	char sector[512];
-	int bitemap_sector;
-	int sector_fe;
+	//char sector[512];
+	//int bitemap_sector;
+	//int sector_fe;
 	
 	file_iterator_t it;
 	/*
@@ -102,8 +102,8 @@ file_iterator_t file_iterator(){
 	/*
 	 * printf("emplacement ");
 	 * printf("%d",sizeblock);*/
-	bitemap_sector = sizeblock;
-	sector_fe = sizeblock+(sizebitemap*sizeblock);
+	//bitemap_sector = sizeblock;
+	//sector_fe = sizeblock+(sizebitemap*sizeblock);
 	
 	/*
 	 * printf("emplacement fe");

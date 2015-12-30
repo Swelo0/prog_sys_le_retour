@@ -9,6 +9,7 @@
 #include "../common/types.h"
 #include "ide.h"
 #include "string.h"
+#include "io.h"
 
 #define FILENAME_SIZE	     32
 #define MAX_BLOCKS	     110
@@ -34,9 +35,9 @@ typedef struct stat_t {
 
 int strcmp (const char* s1, const char* s2);
 
-int file_stat(char *filename, stat_t *stat);
+int file_stat(char *filename/*, stat_t *stat*/);
 
-int file_read(char *filename, void *buf);
+int file_read(char *filename/*, void *buf*/);
 
 int file_remove(char *filename);
 

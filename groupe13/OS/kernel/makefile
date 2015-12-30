@@ -60,7 +60,7 @@ test.o: test.c test.h ../common/types.h io.h periph.h
 ide.o:	ide.c ide.h x86.h ../common/types.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
 
-pfs.o:	pfs.c pfs.h ../common/types.h ide.h string.h
+pfs.o:	pfs.c pfs.h ../common/types.h ide.h string.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
 
 clean:
