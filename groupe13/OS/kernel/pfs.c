@@ -37,10 +37,36 @@ int file_stat(char* filename, stat_t* stat) {
 	
 }
 
-int file_read(char* filename, void* buf){
-	
-	// Code was here
-	
+int file_read(char *filename, void *buf){
+	char current_filename[32] = "";
+	int offset = 0;
+	file_iterator_t it = file_iterator();
+	while (file_next(current_filename, &it)) {
+		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
+		if(!strcmp(current_filename, filename)){
+			printf("\nLecture du fichier: %s", current_filename);
+			for (uint i = 0; i < MAX_BLOCKS; i++){
+				if(it.current.blocks[i] == 0){
+					break;
+				}
+				else{
+					printf("\nNum. du Data Bloc en cours de lecture: %d", it.current.blocks[i]);
+					printf("\nContenu du fichier: ");
+					//Nos blocs font 2048 de taille, les secteurs 512, il faut lire 4 secteurs pour avoir un bloc
+					for (uint j = 0; j < 4; j++){
+						//(it.size_size_entries*it.nb_files_entries)/512 = nombres de secteurs pour les file entries
+						//it.first = nombre de secteur pour sauter le superblock
+						//la boucle for permet de lire 4 secteurs et le buffer les enregistre les un après les autres
+						printf("\n%d", (it.size_file_entries*it.nb_file_entries)/512 + it.first + it.current.blocks[i] + 8 + j);
+						read_sector((it.size_file_entries*it.nb_file_entries)/512 + it.first + it.current.blocks[i] + 8 + j, buf); //+ j *  SECTOR_SIZE);
+					}
+					printf("\n%s", buf);
+				}
+			}
+			return 0;
+		} 
+	}
+	return -1;
 }
 
 int file_remove(char* filename) {
@@ -162,7 +188,7 @@ int file_next(char *filename, file_iterator_t *it){
 	}
 	//maj de l'entrée courante
 	memcpy(&(*it).current, sector + offset, 256);
- 	//copine du nom
+ 	//copie du nom
 	int i = 0;
 	while (sector[offset + i]) {
 		*(filename + i) = sector[offset + i];
