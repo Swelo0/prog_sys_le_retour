@@ -9,9 +9,10 @@ $(OUTPUT).iso: kernel grub/grub.cfg $(OUTPUT)/boot/grub
 	cp grub/grub.cfg $(OUTPUT)/boot/grub/
 	cp kernel/kernel.elf $(OUTPUT)/boot/
 	grub-mkrescue -o $@ $(OUTPUT)
-
+	
 kernel:
 	@make -C kernel MODE=$(MODE)
+	@make -C tools 
 
 $(OUTPUT)/boot/grub:
 	mkdir -p $@
@@ -21,5 +22,6 @@ run: $(OUTPUT).iso
 
 clean:
 	@make -C kernel clean
+	@make -C tools clean
 	rm -rf $(OUTPUT) $(OUTPUT).iso
 

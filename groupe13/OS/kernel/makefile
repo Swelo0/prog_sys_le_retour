@@ -65,4 +65,3 @@ pfs.o:	pfs.c pfs.h ../common/types.h ide.h
 
 clean:
 	rm -f *.o kernel.elf
-
