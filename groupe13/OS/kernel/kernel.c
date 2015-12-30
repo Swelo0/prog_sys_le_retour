@@ -52,8 +52,11 @@ void runKernel()
     #ifdef TEST
 		runTests();
     #endif
+    char buf[2048] = "";
+    file_read("example.txt", &buf);
+    char buf2[2048] = "";
+    file_read("example2.txt", &buf2);
     
-    file_iterator();
 	
 	// Reading keyboard and printing input
     while (1) 
