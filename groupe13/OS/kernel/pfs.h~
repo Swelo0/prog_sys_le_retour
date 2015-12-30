@@ -7,7 +7,15 @@
 /// \brief Implementation of the kernel file system handling functions
 //////////////////////////////////////////////////////////////////////////////////////////
 #include "../common/types.h"
+#include "../tools/fs.h"
 #include "ide.h"
+
+struct file_iterator_t{
+	int nb_file_entries;
+	file_entry* current;
+	int index;
+	file_entry* first;
+};
 
 typedef struct stat_t {
 	int size;

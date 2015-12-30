@@ -65,31 +65,64 @@ int file_exists(char *filename){
 	return 0;
 }
 
+/*
+ Renvoie un itérateur permettant ensuite d'itérer sur tous les fic*hiers du système de fichiers
+ grâce à la fonction file_next. Après appel à cette fonction, l'itérateur pointe sur le
+ premier fichier (s'il y en a au moins un) du système de fichiers.
+*/
 file_iterator_t file_iterator(){
-	 char sb[512];
-	 
-	 read_sector(0,&sb);
-	 
-	 //int32_t sizeblock = (int32_t)(*(sb+8));
-	 
-	 printf("taille d'un block");
-	 printf("%c",sb[1]);
-	 //printf("%d",sizeblock);
-	 /*
-	 for(int i = 0;i<512;i++)
-	  if(sb[i]=='P') {
-	  
-	   printf("position ");
-	   printf("%d",i);
-	   printf("\n");
-	  }*/
-	 printf("\ntest\n");
-	 for(int i = 0;i<124;i++){
-	  	printf("%d",i);
-	  	printf(*(sb+i));
-	 }
+	char sb[512];
+	char sector[512];
+	/*
+	for(int i = 0;i<512;i++)
+		sb[i] = '\0';*/
+	read_sector(0,sb);
+	
+	int32_t sizeblock;
+	int32_t sizebitemap;
+	int32_t nbfileentries;
+	int32_t sizefileentries;
+	int32_t sizedatablocks;
+	
+	memcpy(&sizeblock,sb+8,sizeof(int32_t));
+	memcpy(&sizebitemap,sb+12,sizeof(int32_t));
+	memcpy(&nbfileentries,sb+16,sizeof(int32_t));
+	memcpy(&sizefileentries,sb+20,sizeof(int32_t));
+	memcpy(&sizedatablocks,sb+24,sizeof(int32_t));
+	
+	read_sector(sizeblock,sector);
+	
+	printf("taille d'un block ");
+	printf("%d",sizeblock);
+
+	printf("\n sizebitemap ");
+	printf("%d",sizebitemap);
+	
+	printf("\n nb file entries ");
+	printf("%d",nbfileentries);
+	
+	printf("\n size file entries ");
+	printf("%d",sizefileentries);
+	
+	printf("\n size data blocks ");
+	printf("%d",sizedatablocks);
+	/*
+	for(int i = 8;i<12;i++){
+		//printf("%d",i);
+		printf("%d",sb[i]);
+	}*/
 }
 
+
+/*
+ Cette fonc*tion permet d'itérer sur les fichiers du système de fichiers. L'appel à file_next
+ renvoie 1 si l'itérateur it pointe sur le fichier courant. Dans ce cas, le nom du fichier
+ courant est copié dans filename. Si l'itérateur a déjà itéré sur tous les fichiers, alors la
+ fonction renvoie 0 et rien n'est copié dans filename. A noter qu'il est obligatoire
+ d'initialiser l'itérateur it avec la fonction file_iterator avant d'appeler la fonction
+ file_next.
+ */
 int file_next(char *filename, file_iterator_t *it){
 
+	return 0;
 }

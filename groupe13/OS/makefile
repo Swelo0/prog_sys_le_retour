@@ -3,7 +3,7 @@ FS=tools/fs.img
 
 MODE=normal
 
-.PHONY: clean run kernel doc
+.PHONY: clean run kernel tools
 
 $(OUTPUT).iso: kernel grub/grub.cfg $(OUTPUT)/boot/grub
 	cp grub/grub.cfg $(OUTPUT)/boot/grub/
