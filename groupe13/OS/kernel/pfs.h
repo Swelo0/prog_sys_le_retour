@@ -12,7 +12,8 @@
 #include "io.h"
 
 #define FILENAME_SIZE	     32
-#define MAX_BLOCKS	     110
+#define MAX_BLOCKS	         110
+#define SECTOR_SIZE			 512
 
 typedef struct file_entry {
 
@@ -23,6 +24,10 @@ typedef struct file_entry {
 } __attribute__((packed)) file_entry ;
 
 typedef struct file_iterator_t{
+	int32_t size_block;
+	int32_t size_bitmap;
+	int32_t size_file_entries;
+	int32_t size_data_blocks;
 	int nb_file_entries;
 	file_entry current;
 	int index;

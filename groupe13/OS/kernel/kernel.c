@@ -62,6 +62,15 @@ void runKernel()
 	else
 		printf("File %s doesn't exist\n", file);
 	
+	file_remove(file);
+	
+	if (file_exists(file)) {
+		file_stat("example.txt", s);
+		printf("File:\n   name : %s\n   size : %d bytes\n", s->name, s->size);
+	}
+	else
+		printf("File %s doesn't exist anymore\n", file);
+	
 	// Reading keyboard and printing input
     while (1) 
 		keyboard_print(getc());
