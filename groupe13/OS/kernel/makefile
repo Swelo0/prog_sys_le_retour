@@ -6,7 +6,7 @@ CFLAGS=-std=gnu99 -m32 -fno-builtin -ffreestanding -Wall -Wextra -c
 
 MODE=normal
 
-OBJS=bootloader.o kernel.o gdt.o gdt_asm.o idt.o idt_asm.o string.o periph.o io.o pic.o timer.o keyboard.o
+OBJS=bootloader.o kernel.o gdt.o gdt_asm.o idt.o idt_asm.o string.o periph.o io.o pic.o timer.o keyboard.o ide.o pfs.o
 KERNEL_DEPENDENCIES=
 
 ifeq ($(MODE), test)
@@ -21,7 +21,7 @@ kernel.elf: $(OBJS)
 bootloader.o: bootloader.s
 	$(ASMC) $< -o $@ $(ASMFLAGS)
 	
-kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h io.h timer.o $(KERNEL_DEPENDENCIES)
+kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h io.h timer.o pfs.h $(KERNEL_DEPENDENCIES)
 	$(CC) $< -o $@ $(CFLAGS)
 
 gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h io.h
@@ -55,6 +55,12 @@ keyboard.o:	keyboard.c keyboard.h ../common/types.h x86.h periph.h io.h string.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
 test.o: test.c test.h ../common/types.h io.h periph.h
+	$(CC) $< -o $@ $(CFLAGS)
+
+ide.o:	ide.c ide.h x86.h ../common/types.h io.h
+	$(CC) $< -o $@ $(CFLAGS)
+
+pfs.o:	pfs.c pfs.h ../common/types.h ide.h
 	$(CC) $< -o $@ $(CFLAGS)
 
 clean:

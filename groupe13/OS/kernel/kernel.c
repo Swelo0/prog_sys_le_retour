@@ -52,6 +52,8 @@ void runKernel()
     #ifdef TEST
 		runTests();
     #endif
+    
+    file_iterator();
 	
 	// Reading keyboard and printing input
     while (1) 

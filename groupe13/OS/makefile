@@ -17,7 +17,7 @@ $(OUTPUT)/boot/grub:
 	mkdir -p $@
 
 run: $(OUTPUT).iso
-	qemu-system-i386 -hda $(FS)
+	qemu-system-i386 -cdrom build.iso -hda tools/fs.img
 
 clean:
 	@make -C kernel clean
