@@ -21,7 +21,7 @@ kernel.elf: $(OBJS)
 bootloader.o: bootloader.s
 	$(ASMC) $< -o $@ $(ASMFLAGS)
 	
-kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h ide.h keyboard.h pfs.h $(KERNEL_DEPENDENCIES)
+kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h ide.h pfs.h keyboard.h $(KERNEL_DEPENDENCIES)
 	$(CC) $< -o $@ $(CFLAGS)
 
 gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h io.h

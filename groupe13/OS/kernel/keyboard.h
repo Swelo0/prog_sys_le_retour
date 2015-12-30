@@ -43,5 +43,6 @@
 extern void keyboard_init();
 extern void keyboard_handler();
 extern int getc();
+extern int keyboard_print(int c);
 
 #endif
