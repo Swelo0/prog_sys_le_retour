@@ -73,7 +73,9 @@ int file_exists(char *filename){
 file_iterator_t file_iterator(){
 	char sb[512];
 	char sector[512];
-
+	/*
+	for(int i = 0;i<512;i++)
+		sb[i] = '\0';*/
 	read_sector(0,sb);
 	
 	int32_t sizeblock;
@@ -88,6 +90,7 @@ file_iterator_t file_iterator(){
 	memcpy(&sizefileentries,sb+20,sizeof(int32_t));
 	memcpy(&sizedatablocks,sb+24,sizeof(int32_t));
 	
+	read_sector(sizeblock,sector);
 	
 	printf("taille d'un block ");
 	printf("%d",sizeblock);
@@ -103,6 +106,11 @@ file_iterator_t file_iterator(){
 	
 	printf("\n size data blocks ");
 	printf("%d",sizedatablocks);
+	/*
+	for(int i = 8;i<12;i++){
+		//printf("%d",i);
+		printf("%d",sb[i]);
+	}*/
 }
 
 

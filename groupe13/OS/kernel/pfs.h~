@@ -7,15 +7,25 @@
 /// \brief Implementation of the kernel file system handling functions
 //////////////////////////////////////////////////////////////////////////////////////////
 #include "../common/types.h"
-#include "../tools/fs.h"
 #include "ide.h"
 
-struct file_iterator_t{
+#define FILENAME_SIZE	     32
+#define MAX_BLOCKS	     110
+
+typedef struct file_entry {
+
+		char  name[FILENAME_SIZE];
+		int   size;
+		short blocks[MAX_BLOCKS];
+
+} __attribute__((packed)) file_entry ;
+
+typedef struct file_iterator_t{
 	int nb_file_entries;
 	file_entry* current;
 	int index;
-	file_entry* first;
-};
+	int first;
+}__attribute__((packed)) file_iterator_t ;
 
 typedef struct stat_t {
 	int size;

@@ -106,11 +106,6 @@ file_iterator_t file_iterator(){
 	
 	printf("\n size data blocks ");
 	printf("%d",sizedatablocks);
-	/*
-	for(int i = 8;i<12;i++){
-		//printf("%d",i);
-		printf("%d",sb[i]);
-	}*/
 }
 
 
