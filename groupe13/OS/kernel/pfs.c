@@ -55,20 +55,23 @@ int file_remove(char* filename) {
 	while (file_next(current_filename, &it)) {
 		// Compare
 		if (!strcmp(current_filename, filename)) {
-			
+			//On test si notre file entry est dans la première
+			//ou deuxième partie du secteur [256|256] = 1 secteur de 512
 			if (it.index % 2)
 				offset = 256;
-			
+			//on met le premier caractère de la FE à \0
 			read_sector(it.first + (it.index / 2), sector_fe);
 			sector_fe[offset] = '\0';
 			write_sector(it.first + (it.index / 2), sector_fe);
+			//Parcrous du bitmap et réecriture.
 			for (int i = 0; i < it.size_block; i++)
 				read_sector(it.size_block,sector_bitmap + SECTOR_SIZE * i);
 			
 			int j = 0;
+			//les 36 premiers bytes sont filename + data size
 			while (sector_fe[36+j]) {
-				sector_fe[36+j] = '\0';
-				j++;
+				sector_bitmap[(uint16_t)sector_fe[36+j]] = '\0';
+				j+=2; //data index = 2 bytes
 			}
 			for (int i = 0;i < it.size_block; i++)
 				write_sector(it.size_block, sector_bitmap + SECTOR_SIZE * i);
@@ -145,7 +148,7 @@ int file_next(char *filename, file_iterator_t *it){
 	
 	char sector[SECTOR_SIZE];
 	int offset = 0;
-	
+	// tant qu on a pas d'entrée fichier
 	while(1) {
 		
 		if (++(*it).index >= (*it).nb_file_entries)
@@ -157,9 +160,9 @@ int file_next(char *filename, file_iterator_t *it){
 		if (sector[offset])
 			break;
 	}
-	
+	//maj de l'entrée courante
 	memcpy(&(*it).current, sector + offset, 256);
-	
+ 	//copine du nom
 	int i = 0;
 	while (sector[offset + i]) {
 		*(filename + i) = sector[offset + i];
