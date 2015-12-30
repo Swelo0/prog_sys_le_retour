@@ -23,7 +23,7 @@ typedef struct file_entry {
 
 } __attribute__((packed)) file_entry ;
 
- typedef struct file_iterator_t{
+typedef struct file_iterator_t{
 	int32_t size_block;
 	int32_t size_bitmap;
 	int32_t size_file_entries;
@@ -35,19 +35,20 @@ typedef struct file_entry {
 } __attribute__((packed)) file_iterator_t ;
 
 typedef struct stat_t {
+	char name[FILENAME_SIZE];
 	int size;
 } __attribute__((packed)) stat_t ;
 
 int strcmp (const char* s1, const char* s2);
 
-int file_stat(char *filename, stat_t *stat);
+int file_stat(char* filename, stat_t* stat);
 
-int file_read(char *filename, void *buf);
+int file_read(char* filename, void* buf);
 
-int file_remove(char *filename);
+int file_remove(char* filename);
 
-int file_exists(char *filename);
+int file_exists(char* filename);
 
 file_iterator_t file_iterator();
 
-int file_next(char *filename, file_iterator_t *it);
+int file_next(char* filename, file_iterator_t* it);

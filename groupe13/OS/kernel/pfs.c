@@ -9,29 +9,35 @@
 
 #include "pfs.h"
 
-int strcmp (const char* s1, const char* s2)
-{
-    while(*s1 && (*s1==*s2))
-        s1++,s2++;
-    return *(const unsigned char*)s1-*(const unsigned char*)s2;
+int strcmp (const char* s1, const char* s2) {
+    while(*s1 && (*s1==*s2)) s1++, s2++;
+    return *(const unsigned char*)s1 - *(const unsigned char*)s2;
 }
 
-int file_stat(char *filename, stat_t *stat){
+int file_stat(char* filename, stat_t* stat) {
 	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
-	while (file_next(current_filename, &it)) {
-		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
-		if(!strcmp(current_filename, filename)){
-			//on utilise l'itérateur pour chopper et renvoyer la taille du fichier dans la structure
-			//stat->size = it->file_entrie->size ou un truc du genre	
+	
+	// Iterate
+	while (file_next(current_filename, &it))
+		// Compare names
+		if  (!strcmp(current_filename, filename)) {
+			// Stat structure
+			stat->size = it.current.size;
+			for (int i = 0; i < FILENAME_SIZE; i++)
+				if (stat->name[i]) stat->name[i] = it.current.name[i];
+				else break;
+				
+			return 0;
+			
 		}	
-	}
+		
 	return -1;
+	
 }
 
 int file_read(char *filename, void *buf){
 	char current_filename[32] = "";
-	int offset = 0;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -49,8 +55,8 @@ int file_read(char *filename, void *buf){
 						//(it.size_size_entries*it.nb_files_entries)/512 = nombres de secteurs pour les file entries
 						//it.first = nombre de secteur pour sauter le superblock
 						//la boucle for permet de lire 4 secteurs et le buffer les enregistre les un après les autres
-						printf("\n%d", (it.size_file_entries*it.nb_file_entries)/512 + it.first + it.current.blocks[i] + 8 + j);
-						read_sector((it.size_file_entries*it.nb_file_entries)/512 + it.first + it.current.blocks[i] + 8 + j, buf); //+ j *  SECTOR_SIZE);
+						//Affichage du num. de secteur: printf("\n%d", (it.size_file_entries*it.nb_file_entries)/512 + it.first + (it.current.blocks[i]*4) + 1 + j);
+						read_sector((it.size_file_entries*it.nb_file_entries)/512 + it.first + (it.current.blocks[i]*4) + 1 + j, buf + j *  SECTOR_SIZE);
 					}
 					printf("\n%s", buf);
 				}
@@ -61,28 +67,61 @@ int file_read(char *filename, void *buf){
 	return -1;
 }
 
-int file_remove(char *filename){
+int file_remove(char* filename) {
+	
+	int offset = 0;
 	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
+	char sector_bitmap[SECTOR_SIZE*it.size_block];
+	char sector_fe[SECTOR_SIZE];
+	
+	// Iterate
 	while (file_next(current_filename, &it)) {
-		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
-		if(!strcmp(current_filename, filename)){
+		// Compare
+		if (!strcmp(current_filename, filename)) {
+			//On test si notre file entry est dans la première
+			//ou deuxième partie du secteur [256|256] = 1 secteur de 512
+			if (it.index % 2)
+				offset = 256;
+			//on met le premier caractère de la FE à \0
+			read_sector(it.first + (it.index / 2), sector_fe);
+			sector_fe[offset] = '\0';
+			write_sector(it.first + (it.index / 2), sector_fe);
+			//Parcrous du bitmap et réecriture.
+			for (int i = 0; i < it.size_block; i++)
+				read_sector(it.size_block,sector_bitmap + SECTOR_SIZE * i);
 			
+			int j = 0;
+			//les 36 premiers bytes sont filename + data size
+			while (sector_fe[36+j]) {
+				sector_bitmap[(uint16_t)sector_fe[36+j]] = '\0';
+				j+=2; //data index = 2 bytes
+			}
+			for (int i = 0;i < it.size_block; i++)
+				write_sector(it.size_block, sector_bitmap + SECTOR_SIZE * i);
 		}	
 	}
+	
 	return -1;
+	
 }
 
-int file_exists(char *filename){
+/*
+ * Vérifie qu'un fichier existe et renvoie l'équivalent d'un booléen
+ */
+int file_exists(char* filename) {
+	
 	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
-	while (file_next(current_filename, &it)) {
-		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
-		if(!strcmp(current_filename, filename)){
+	
+	// Iterate
+	while (file_next(current_filename, &it))
+		// Compare names
+		if (!strcmp(current_filename, filename))
 			return 1;
-		}	
-	}
+		
 	return 0;
+	
 }
 
 /*
@@ -91,15 +130,10 @@ int file_exists(char *filename){
  * premier fichier (s'il y en a au moins un) du système de fichiers.
  */
 file_iterator_t file_iterator(){
-	char sb[512];
-	//char sector[512];
-	//int bitemap_sector;
-	//int sector_fe;
+	
+	char sb[SECTOR_SIZE];
 	
 	file_iterator_t it;
-	/*
-	 * for(int i = 0;i<512;i++)
-	 *	sb[i] = '\0';*/
 	read_sector(0,sb);
 	
 	int32_t sizeblock;
@@ -119,14 +153,15 @@ file_iterator_t file_iterator(){
 	it.size_file_entries = nbfileentries;
 	it.size_data_blocks  = sizefileentries;
 	it.nb_file_entries   = nbfileentries;
-	it.index = -1;
-	it.first = sizeblock+(sizebitmap*sizeblock);
+	it.index             = -1;
+	it.first             = sizeblock + (sizebitmap * sizeblock);
 	
 	return it;
+	
 }
 
 /*
- * Cette fonc*tion permet d'itérer sur les fichiers du système de fichiers. L'appel à file_next
+ * Cette fonction permet d'itérer sur les fichiers du système de fichiers. L'appel à file_next
  * renvoie 1 si l'itérateur it pointe sur le fichier courant. Dans ce cas, le nom du fichier
  * courant est copié dans filename. Si l'itérateur a déjà itéré sur tous les fichiers, alors la
  * fonction renvoie 0 et rien n'est copié dans filename. A noter qu'il est obligatoire
@@ -134,25 +169,30 @@ file_iterator_t file_iterator(){
  * file_next.
  */
 int file_next(char *filename, file_iterator_t *it){
-	char sector[512];
+	
+	char sector[SECTOR_SIZE];
 	int offset = 0;
- 
+	// tant qu on a pas d'entrée fichier
 	while(1) {
-		if(++(*it).index >= (*it).nb_file_entries)
-			return 0;
-		read_sector((*it).first+((*it).index/2),sector);
-		if ((*it).index%2)
+		
+		if (++(*it).index >= (*it).nb_file_entries)
+			return 0;	
+		read_sector((*it).first + ((*it).index / 2), sector);
+		if ((*it).index % 2)
 			offset = 256;
-		if(sector[offset] != '\0')
+		if (sector[offset])
 			break;
 	}
-	memcpy(&(*it).current,sector+offset,256);
+	//maj de l'entrée courante
+	memcpy(&(*it).current, sector + offset, 256);
+ 	//copie du nom
 	int i = 0;
-	
-	while(sector[offset+i] != '\0') {
-		*(filename+i) = sector[offset+i];
+	while (sector[offset + i]) {
+		*(filename + i) = sector[offset + i];
 		i++;
 	}
 	*(filename+i) = '\0';
+	
 	return 1;
+	
 }
