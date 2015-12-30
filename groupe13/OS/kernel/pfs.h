@@ -8,6 +8,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 #include "../common/types.h"
 #include "ide.h"
+#include "string.h"
 
 #define FILENAME_SIZE	     32
 #define MAX_BLOCKS	     110

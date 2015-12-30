@@ -17,7 +17,7 @@ int strcmp (const char* s1, const char* s2)
 }
 
 int file_stat(char *filename, stat_t *stat){
-	char* current_filename;
+	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -30,7 +30,7 @@ int file_stat(char *filename, stat_t *stat){
 }
 
 int file_read(char *filename, void *buf){
-	char* current_filename;
+	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -42,7 +42,7 @@ int file_read(char *filename, void *buf){
 }
 
 int file_remove(char *filename){
-	char* current_filename;
+	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -54,7 +54,7 @@ int file_remove(char *filename){
 }
 
 int file_exists(char *filename){
-	char* current_filename;
+	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -106,11 +106,6 @@ file_iterator_t file_iterator(){
 	
 	printf("\n size data blocks ");
 	printf("%d",sizedatablocks);
-	/*
-	for(int i = 8;i<12;i++){
-		//printf("%d",i);
-		printf("%d",sb[i]);
-	}*/
 }
 
 

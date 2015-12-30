@@ -21,7 +21,7 @@ kernel.elf: $(OBJS)
 bootloader.o: bootloader.s
 	$(ASMC) $< -o $@ $(ASMFLAGS)
 	
-kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h io.h timer.o pfs.h $(KERNEL_DEPENDENCIES)
+kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h ide.h keyboard.h pfs.h $(KERNEL_DEPENDENCIES)
 	$(CC) $< -o $@ $(CFLAGS)
 
 gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h io.h
@@ -60,7 +60,7 @@ test.o: test.c test.h ../common/types.h io.h periph.h
 ide.o:	ide.c ide.h x86.h ../common/types.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
 
-pfs.o:	pfs.c pfs.h ../common/types.h ide.h
+pfs.o:	pfs.c pfs.h ../common/types.h ide.h string.h
 	$(CC) $< -o $@ $(CFLAGS)
 
 clean:

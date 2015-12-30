@@ -17,7 +17,7 @@ int strcmp (const char* s1, const char* s2)
 }
 
 int file_stat(char *filename, stat_t *stat){
-	char* current_filename;
+	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -30,7 +30,7 @@ int file_stat(char *filename, stat_t *stat){
 }
 
 int file_read(char *filename, void *buf){
-	char* current_filename;
+	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -42,7 +42,7 @@ int file_read(char *filename, void *buf){
 }
 
 int file_remove(char *filename){
-	char* current_filename;
+	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -54,7 +54,7 @@ int file_remove(char *filename){
 }
 
 int file_exists(char *filename){
-	char* current_filename;
+	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -66,7 +66,7 @@ int file_exists(char *filename){
 }
 
 /*
- Renvoie un itérateur permettant ensuite d'itérer sur tous les fic*hiers du système de fichiers
+ Renvoie un itérateur permettant ensuite d'itérer sur tous les fichiers du système de fichiers
  grâce à la fonction file_next. Après appel à cette fonction, l'itérateur pointe sur le
  premier fichier (s'il y en a au moins un) du système de fichiers.
 */

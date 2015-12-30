@@ -25,7 +25,7 @@ typedef struct file_iterator_t{
 	file_entry* current;
 	int index;
 	int first;
-}__attribute__((packed)) file_iterator_t ;
+} __attribute__((packed)) file_iterator_t ;
 
 typedef struct stat_t {
 	int size;
