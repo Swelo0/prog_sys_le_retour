@@ -35,9 +35,16 @@ int file_stat(char* filename, stat_t* stat) {
 	return -1;
 	
 }
+<<<<<<< HEAD
 
 int file_read(char *filename, void *buf){
 	char current_filename[32] = "";
+=======
+
+int file_read(char *filename, void *buf){
+	char current_filename[32] = "";
+	int offset = 0;
+>>>>>>> 126adf8d9821ae10608c473da06a9ac05264bfe0
 	file_iterator_t it = file_iterator();
 	while (file_next(current_filename, &it)) {
 		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
@@ -55,16 +62,27 @@ int file_read(char *filename, void *buf){
 						//(it.size_size_entries*it.nb_files_entries)/512 = nombres de secteurs pour les file entries
 						//it.first = nombre de secteur pour sauter le superblock
 						//la boucle for permet de lire 4 secteurs et le buffer les enregistre les un après les autres
+<<<<<<< HEAD
 						//Affichage du num. de secteur: printf("\n%d", (it.size_file_entries*it.nb_file_entries)/512 + it.first + (it.current.blocks[i]*4) + 1 + j);
 						read_sector((it.size_file_entries*it.nb_file_entries)/512 + it.first + (it.current.blocks[i]*4) + 1 + j, buf + j *  SECTOR_SIZE);
+=======
+						printf("\n%d", (it.size_file_entries*it.nb_file_entries)/512 + it.first + it.current.blocks[i] + 8 + j);
+						read_sector((it.size_file_entries*it.nb_file_entries)/512 + it.first + it.current.blocks[i] + 8 + j, buf); //+ j *  SECTOR_SIZE);
+>>>>>>> 126adf8d9821ae10608c473da06a9ac05264bfe0
 					}
 					printf("\n%s", buf);
 				}
 			}
 			return 0;
+<<<<<<< HEAD
 		}	
 	}
 	return -1;
+=======
+		} 
+	}
+	return -1;
+>>>>>>> 126adf8d9821ae10608c473da06a9ac05264bfe0
 }
 
 int file_remove(char* filename) {

@@ -69,7 +69,7 @@ void runKernel()
 	else
 		printf("File %s doesn't exist\n", file);
 	
-	//file_remove(file);
+	file_remove(file);
 	
 	if (file_exists(file)) {
 		file_stat("example.txt", s);
