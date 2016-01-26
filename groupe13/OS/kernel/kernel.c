@@ -53,30 +53,27 @@ void runKernel()
 		runTests();
     #endif
     
-    printf("\nAffichage du contenu de example.txt");
-    char buf[2048] = "";
-    file_read("example.txt", &buf);
-    printf("\nAffichage du contenu de example2.txt");
-    char buf2[2048] = "";
-    file_read("example2.txt", &buf2);
-    
-	stat_t* s;
 	char* file = "example.txt";
-	if (file_exists(file)) {
-		file_stat("example.txt", s);
-		printf("File:\n   name : %s\n   size : %d bytes\n", s->name, s->size);
+	// Buffer size is equivalent to 4 blocks
+    char buf[2048] = "";
+	stat_t* s;
+	if ((file_exists(file)) && (!file_stat(file, s))) {
+		printf("File:\n   name : %s\n   size : %d bytes\nContent:\n", s->name, s->size);
+		file_read(file, &buf);
 	}
 	else
 		printf("File %s doesn't exist\n", file);
 	
+	/*
 	file_remove(file);
 	
-	if (file_exists(file)) {
-		file_stat("example.txt", s);
-		printf("File:\n   name : %s\n   size : %d bytes\n", s->name, s->size);
+	if ((file_exists(file)) && (!file_stat(file, s))) {
+		printf("File:\n   name : %s\n   size : %d bytes\nContent:\n", s->name, s->size);
+		file_read(file, &buf);
 	}
 	else
 		printf("File %s doesn't exist anymore\n", file);
+	*/
 	
 	// Reading keyboard and printing input
     while (1) 

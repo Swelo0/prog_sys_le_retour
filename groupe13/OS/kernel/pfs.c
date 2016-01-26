@@ -18,7 +18,7 @@ int file_stat(char* filename, stat_t* stat) {
 	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	
-	// Iterate
+	// Iterator looking for file
 	while (file_next(current_filename, &it))
 		// Compare names
 		if  (!strcmp(current_filename, filename)) {
@@ -36,35 +36,42 @@ int file_stat(char* filename, stat_t* stat) {
 	
 }
 
-int file_read(char *filename, void *buf){
-	char current_filename[32] = "";
+int file_read(char* filename, void* buf) {
+	
+	char current_filename[FILENAME_SIZE] = "";
 	file_iterator_t it = file_iterator();
+	
+	// Iterator looking for file
 	while (file_next(current_filename, &it)) {
-		//si strcmp renvoie 0, c'est que les chaines sont égales, donc if inversé
-		if(!strcmp(current_filename, filename)){
-			printf("\nLecture du fichier: %s", current_filename);
-			for (uint i = 0; i < MAX_BLOCKS; i++){
-				if(it.current.blocks[i] == 0){
+		// File found
+		if (!strcmp(current_filename, filename)) {
+			
+			// Parsing data blocks
+			for (int i = 0; i < MAX_BLOCKS; i++) {
+				// Ignoring blocks indexed 0
+				if (!it.current.blocks[i])
 					break;
-				}
-				else{
-					printf("\nNum. du Data Bloc en cours de lecture: %d", it.current.blocks[i]);
-					printf("\nContenu du fichier: ");
-					//Nos blocs font 2048 de taille, les secteurs 512, il faut lire 4 secteurs pour avoir un bloc
-					for (uint j = 0; j < 4; j++){
-						//(it.size_size_entries*it.nb_files_entries)/512 = nombres de secteurs pour les file entries
-						//it.first = nombre de secteur pour sauter le superblock
-						//la boucle for permet de lire 4 secteurs et le buffer les enregistre les un après les autres
-						//Affichage du num. de secteur: printf("\n%d", (it.size_file_entries*it.nb_file_entries)/512 + it.first + (it.current.blocks[i]*4) + 1 + j);
-						read_sector((it.size_file_entries*it.nb_file_entries)/512 + it.first + (it.current.blocks[i]*4) + 1 + j, buf + j *  SECTOR_SIZE);
+				else {
+					// We read "it.size_block" sectors per block and store them in the buffer
+					for (int j = 0; j < it.size_block; j++) {
+						// "(it.size_size_entries * it.nb_files_entries) / SECTOR_SIZE" sectors for all file entries
+						// "it.first" sectors to skip the superblock
+						read_sector((it.size_file_entries * it.nb_file_entries) / SECTOR_SIZE + it.first + (it.current.blocks[i] * it.size_block) + j + 1, buf + j * SECTOR_SIZE);
 					}
-					printf("\n%s", buf);
+					// Display
+					printf("%s", buf);
 				}
 			}
+			
+			// Safety carriage return
+			printf("\n");
 			return 0;
+			
 		} 
 	}
+	
 	return -1;
+	
 }
 
 int file_remove(char* filename) {
@@ -129,7 +136,7 @@ int file_exists(char* filename) {
  * grâce à la fonction file_next. Après appel à cette fonction, l'itérateur pointe sur le
  * premier fichier (s'il y en a au moins un) du système de fichiers.
  */
-file_iterator_t file_iterator(){
+file_iterator_t file_iterator() {
 	
 	char sb[SECTOR_SIZE];
 	
