@@ -53,27 +53,19 @@ void runKernel()
 		runTests();
     #endif
     
+	file_iterator_t it = file_iterator();
+	int block_size = SECTOR_SIZE * it.size_block;
+	
+	// Read file if existing
 	char* file = "example.txt";
-	// Buffer size is equivalent to 4 blocks
-    char buf[2048] = "";
 	stat_t* s;
 	if ((file_exists(file)) && (!file_stat(file, s))) {
-		printf("File:\n   name : %s\n   size : %d bytes\nContent:\n", s->name, s->size);
-		file_read(file, &buf);
+		// Allocating a integer number of blocks for the buffer
+		char* buf[s->size + (block_size - (s->size % block_size))];
+		if (!file_read(file, &buf)) printf("%s\n", buf);
 	}
 	else
-		printf("File %s doesn't exist\n", file);
-	
-	/*
-	file_remove(file);
-	
-	if ((file_exists(file)) && (!file_stat(file, s))) {
-		printf("File:\n   name : %s\n   size : %d bytes\nContent:\n", s->name, s->size);
-		file_read(file, &buf);
-	}
-	else
-		printf("File %s doesn't exist anymore\n", file);
-	*/
+		printf("File %s doesn't exist.\n", file);
 	
 	// Reading keyboard and printing input
     while (1) 

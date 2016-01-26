@@ -47,24 +47,17 @@ int file_read(char* filename, void* buf) {
 		if (!strcmp(current_filename, filename)) {
 			
 			// Parsing data blocks
-			for (int i = 0; i < MAX_BLOCKS; i++) {
+			for (int i = 0; i < MAX_BLOCKS; i++) 
 				// Ignoring blocks indexed 0
 				if (!it.current.blocks[i])
 					break;
-				else {
-					// We read "it.size_block" sectors per block and store them in the buffer
-					for (int j = 0; j < it.size_block; j++) {
+				else 
+					// We read 1 block ("it.size_block" sectors) and store it in the buffer
+					for (int j = 0; j < it.size_block; j++)
 						// "(it.size_size_entries * it.nb_files_entries) / SECTOR_SIZE" sectors for all file entries
 						// "it.first" sectors to skip the superblock
-						read_sector((it.size_file_entries * it.nb_file_entries) / SECTOR_SIZE + it.first + (it.current.blocks[i] * it.size_block) + j + 1, buf + j * SECTOR_SIZE);
-					}
-					// Display
-					printf("%s", buf);
-				}
-			}
-			
-			// Safety carriage return
-			printf("\n");
+						read_sector((it.size_file_entries * it.nb_file_entries) / SECTOR_SIZE + it.first + (it.current.blocks[i] * it.size_block) + j + 1, buf + j * SECTOR_SIZE);					
+
 			return 0;
 			
 		} 
