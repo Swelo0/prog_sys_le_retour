@@ -175,7 +175,7 @@ void print_char(char c)
 	set_cursor_offset(new_cursor_offset);
 }
 
-void print_str(char *str)
+void print_str(char* str)
 {
     // Prints each character of the string
     while (*str != '\0')

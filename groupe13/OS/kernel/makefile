@@ -6,7 +6,7 @@ CFLAGS=-std=gnu99 -m32 -fno-builtin -ffreestanding -Wall -Wextra -c
 
 MODE=normal
 
-OBJS=bootloader.o kernel.o gdt.o gdt_asm.o idt.o idt_asm.o string.o periph.o io.o pic.o timer.o keyboard.o ide.o pfs.o
+OBJS=bootloader.o kernel.o gdt.o gdt_asm.o idt.o idt_asm.o string.o periph.o io.o pic.o timer.o keyboard.o ide.o pfs.o syscall.o syscall_asm.o task_asm.o
 KERNEL_DEPENDENCIES=
 
 ifeq ($(MODE), test)
@@ -24,7 +24,7 @@ bootloader.o: bootloader.s
 kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h ide.h pfs.h keyboard.h $(KERNEL_DEPENDENCIES)
 	$(CC) $< -o $@ $(CFLAGS)
 
-gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h io.h
+gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h io.h task.h
 	$(CC) $< -o $@ $(CFLAGS)
 
 gdt_asm.o: gdt_asm.s const.inc
@@ -62,6 +62,15 @@ ide.o:	ide.c ide.h x86.h ../common/types.h io.h
 
 pfs.o:	pfs.c pfs.h ../common/types.h ide.h string.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
+	
+syscall.o:	syscall.c ../common/types.h ../common/syscall_nb.h io.h keyboard.h
+	$(CC) $< -o $@ $(CFLAGS)
+	
+syscall_asm.o:	syscall_asm.s const.inc
+	$(ASMC) $< -o $@ $(ASMFLAGS)
+	
+task_asm.o:	task_asm.s
+	$(ASMC) $< -o $@ $(ASMFLAGS)
 
 clean:
 	rm -f *.o kernel.elf

@@ -101,6 +101,11 @@ void idt_init() {
 	// [32..47] --> 16 IRQ
 	for (uint16_t i = 0; i < IRQ_LIMIT; i++)
 		idt[i + IRQ_BASE] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t) irq_tab[i], TYPE_INTERRUPT_GATE, DPL_KERNEL);
+	
+	// L'entrée 48 est utilisée pour les appels système
+	// Thierry note : "Pareil que pour gdt, ça peut pas aller dans le .h ça ?"
+	extern void _syscall_handler();  // Implemented in syscall_asm.s
+	idt[48] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t) &_syscall_handler, TYPE_TRAP_GATE, DPL_USER);
 		
 	// Chargement IDT dans le CPU
 	idt_flush(&idt_ptr);

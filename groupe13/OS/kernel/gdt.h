@@ -5,6 +5,7 @@
 #include "x86.h"
 #include "string.h"
 #include "io.h"
+#include "task.h"
 
 // Structure of a GDT descriptor. There are 2 types of descriptors: segments and TSS.
 // Section 3.4.5 of Intel 64 & IA32 architectures software developer's manual describes
@@ -37,5 +38,6 @@ typedef struct gdt_ptr_st {
 
 extern void gdt_init();
 extern void gdt_flush(gdt_ptr_t *gdt_ptr);
+extern void load_task_register(uint16_t tss_selector); 
 
 #endif
