@@ -1,3 +1,6 @@
+#ifndef _PFS_H_
+#define _PFS_H_
+
 //////////////////////////////////////////////////////////////////////////////////////////
 /// \file fs.h
 /// \author Thierry Mourao
@@ -52,3 +55,5 @@ int file_exists(char* filename);
 file_iterator_t file_iterator();
 
 int file_next(char* filename, file_iterator_t* it);
+
+#endif

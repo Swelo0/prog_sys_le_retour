@@ -11,6 +11,10 @@
 
 #define GDT_INDEX_TO_SELECTOR(idx) ((idx) << 3)
 
+// Task structures array
+int tasks_nb = 8;
+task_t tasks[8];
+
 // GDT = Null + Code + Data + TSS + 8x (TSS + LDT) = 20
 static gdt_entry_t gdt[20];
 
@@ -66,34 +70,82 @@ gdt_entry_t gdt_make_ldt(uint32_t base, uint32_t limit, uint8_t dpl) {
 	return build_entry(base, limit, TYPE_LDT, S_SYSTEM, DB_SYS, 0, dpl);
 }
 
-// Returns a GDT entry's selector
+// Returns a GDT entry selector
 uint gdt_entry_to_selector(gdt_entry_t *entry) {
 	return GDT_INDEX_TO_SELECTOR(entry - gdt);
 }
 
+// Executes a binary program
+int exec(char* bin) {
+	
+	// Looking for free task
+	int index = -1;
+	for (int i = 0; i < tasks_nb; i++)
+		if (tasks[i].free) {
+			index = i;
+			break;
+		}
+	if (index < 0) return 1;
+	
+	stat_t* s = &((stat_t) { "", 0 });
+	file_iterator_t it = file_iterator();
+	int block_size = SECTOR_SIZE * it.size_block;
+	// Read program if existing
+	if ((file_exists(bin)) && (!file_stat(bin, s))) {
+		
+		// Allocating a integer number of blocks for the buffer
+		int bufsize = s->size + (block_size - (s->size % block_size));
+		char* buf[bufsize];
+		if (file_read(bin, &buf)) return 3;
+		
+		// Copy binary program at the right address
+		memcpy((uint32_t*) tasks[index].addr, &buf, bufsize);
+		
+		/*
+		// Init task
+		"Le TSS de la tâche doit être initialisé correctement : en particulier, 
+		le programme a dû être chargé à l'adresse où est mappé le segment de 
+		code de la LDT et le pointeur d'instruction doit pointer sur l'adresse de
+		la première instruction (adresse 0)."
+		
+		// Call task with corresponding TSS selector
+		call_task((uint16_t) &gdt[4 + index * 2]); 
+		*/
+		
+		// Update structure array
+		tasks[index].free = 0;
+		
+	}
+	else return 2;
+	
+	return 0;
+	
+}
+
 // Init a task in the GDT at specified index (LDT at index + 1)
 void setup_task(int index) {
-	
-	// gdt[i]   : Task TSS descriptor
-	// gdt[i+1] : Task LDT descriptor
 
 	static tss_t task_tss;
 	static gdt_entry_t task_ldt[2];
 
 	// Add the task's TSS and LDT to the GDT
-	gdt[index] = gdt_make_tss(&task_tss, DPL_KERNEL);
-	gdt[index + 1] = gdt_make_ldt((uint32_t)task_ldt, sizeof(task_ldt)-1, DPL_KERNEL);
+	gdt[4 + 2 * index] = gdt_make_tss(&task_tss, DPL_KERNEL);
+	gdt[5 + 2 * index] = gdt_make_ldt((uint32_t)task_ldt, sizeof(task_ldt)-1, DPL_KERNEL);
 	// int gdt_tss_sel = gdt_entry_to_selector(&gdt[index]); Commented because unused. Correct if it changes
 	int gdt_ldt_sel = gdt_entry_to_selector(&gdt[index + 1]);
 
 	// Define code and data segments in the LDT; both segments are overlapping
-	uint32_t task_addr = 0x800000;  // @8MB
+	uint32_t task_addr = 0x80000 + index * 0x100000;  // 8MB for each task
 	int ldt_code_idx = 0;
 	int ldt_data_idx = 1;
 	uint limit = 0x10000;  // limit of 64KB
 	task_ldt[ldt_code_idx] = code_segment(task_addr, limit / 4096, DPL_USER);  // code
 	task_ldt[ldt_data_idx] = data_segment(task_addr, limit / 4096, DPL_USER);  // data + stack
 
+	// Structure array init
+	tasks[index].free = 1;
+	tasks[index].addr = task_addr;
+	
 	// Initialize the TSS fields
 	// The LDT selector must point to the task's LDT
 	task_tss.ldt_selector = gdt_ldt_sel;
@@ -120,19 +172,11 @@ void gdt_init() {
 	// Set the address and the size of the GDT in the pointer
 	gdt_ptr.limit = sizeof(gdt);
 	gdt_ptr.base = (uint32_t)&gdt;
-
+	
 	// Initializing the three segment descriptors in the GDT : NULL, code segment, data segment
 	gdt[0] = null_segment();
 	gdt[1] = code_segment(0, 1048575, DPL_KERNEL);
 	gdt[2] = data_segment(0, 1048575, DPL_KERNEL);
-
-    // Load the GDT
-    gdt_flush(&gdt_ptr);
-	
-	// Confirmation message
-	set_text_color(LIGHT_GREEN);
-	printf("OK\n");
-	set_text_color(WHITE);
 	
 	// gdt[3] : entry for initial kernel TSS (CPU state of first task saved there)
 	static uint8_t initial_tss_kernel_stack[65536];  // 64KB of stack
@@ -140,15 +184,21 @@ void gdt_init() {
 	gdt[3] = gdt_make_tss(&initial_tss, DPL_KERNEL);
 	memset(&initial_tss, 0, sizeof(tss_t));
 	initial_tss.ss0 = GDT_KERNEL_DATA_SELECTOR;
-	initial_tss.esp0 = ((uint32_t)initial_tss_kernel_stack) + sizeof(initial_tss_kernel_stack);
+	initial_tss.esp0 = ((uint32_t) initial_tss_kernel_stack) + sizeof(initial_tss_kernel_stack);
 
-	// Load the task register to point to the initial TSS selector.
-	// IMPORTANT: The GDT must be already loaded before loading the task register!
-	// Implemented in task_asm.s	 
+	// Load the GDT
+    gdt_flush(&gdt_ptr);
+	
+	// Load the task register to point to the initial TSS selector
 	load_task_register(gdt_entry_to_selector(&gdt[3]));
 
 	// Setup 8 tasks (2 entries each in the GDT)
-	for (int i = 0; i < 8; i++)
-		setup_task(4 + i * 2);	
+	for (int i = 0; i < tasks_nb; i++)
+		setup_task(i);	
+	
+	// Confirmation message
+	set_text_color(LIGHT_GREEN);
+	printf("OK\n");
+	set_text_color(WHITE);
 	
 }

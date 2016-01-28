@@ -15,6 +15,7 @@ int strcmp (const char* s1, const char* s2) {
 }
 
 int file_stat(char* filename, stat_t* stat) {
+	
 	char* current_filename = NULL;
 	file_iterator_t it = file_iterator();
 	

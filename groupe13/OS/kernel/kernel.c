@@ -52,20 +52,8 @@ void runKernel()
     #ifdef TEST
 		runTests();
     #endif
-    
-	file_iterator_t it = file_iterator();
-	int block_size = SECTOR_SIZE * it.size_block;
 	
-	// Read file if existing
-	char* file = "example.txt";
-	stat_t* s;
-	if ((file_exists(file)) && (!file_stat(file, s))) {
-		// Allocating a integer number of blocks for the buffer
-		char* buf[s->size + (block_size - (s->size % block_size))];
-		if (!file_read(file, &buf)) printf("%s\n", buf);
-	}
-	else
-		printf("File %s doesn't exist.\n", file);
+	printf("Exec -> %d\n", exec("app.elf"));
 	
 	// Reading keyboard and printing input
     while (1) 

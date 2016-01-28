@@ -9,6 +9,7 @@
 
 #include "io.h"
 #include "keyboard.h"
+#include "pfs.h"
 
 #define UNUSED(x) ((void)(x))
 
@@ -31,7 +32,7 @@ int syscall_handler(syscall_t nb, uint32_t arg1, uint32_t arg2, uint32_t arg3, u
 			break;
 			
 		case SYSCALL_GETC:
-			print_char((char) getc());
+			ret = getc();
 			break;
 			
 		case SYSCALL_FILE_STAT:

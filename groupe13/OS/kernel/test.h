@@ -12,6 +12,8 @@
 
 #include "timer.h"
 #include "io.h"
+#include "kernel.h"
+
 //////////////////////////////////////////////////////////////////////////////////////////
 /// \fn extern void runTests()
 /// \brief Runs the testing procedure.

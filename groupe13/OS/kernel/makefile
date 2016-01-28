@@ -24,7 +24,7 @@ bootloader.o: bootloader.s
 kernel.o: kernel.c kernel.h ../common/types.h gdt.h idt.h ide.h pfs.h keyboard.h $(KERNEL_DEPENDENCIES)
 	$(CC) $< -o $@ $(CFLAGS)
 
-gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h io.h task.h
+gdt.o: gdt.c gdt.h ../common/types.h x86.h string.h io.h task.h pfs.h
 	$(CC) $< -o $@ $(CFLAGS)
 
 gdt_asm.o: gdt_asm.s const.inc
@@ -54,7 +54,7 @@ timer.o:	timer.c timer.h ../common/types.h periph.h io.h
 keyboard.o:	keyboard.c keyboard.h ../common/types.h x86.h periph.h io.h string.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-test.o: test.c test.h ../common/types.h io.h periph.h
+test.o: test.c test.h ../common/types.h io.h periph.h kernel.h
 	$(CC) $< -o $@ $(CFLAGS)
 
 ide.o:	ide.c ide.h x86.h ../common/types.h io.h
@@ -63,7 +63,7 @@ ide.o:	ide.c ide.h x86.h ../common/types.h io.h
 pfs.o:	pfs.c pfs.h ../common/types.h ide.h string.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-syscall.o:	syscall.c ../common/types.h ../common/syscall_nb.h io.h keyboard.h
+syscall.o:	syscall.c ../common/types.h ../common/syscall_nb.h io.h keyboard.h pfs.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
 syscall_asm.o:	syscall_asm.s const.inc
