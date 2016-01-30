@@ -46,7 +46,7 @@ int file_read(char* filename, void* buf) {
 		// File found
 		if (!strcmp(current_filename, filename)) {
 			// Parsing data blocks
-			for (int i = 0; i < MAX_BLOCKS; i++) {
+			for (int i = 0; i < MAX_BLOCKS; i++)
 				// Ignoring blocks indexed 0
 				if (!it.current.blocks[i])
 					break;
@@ -56,7 +56,7 @@ int file_read(char* filename, void* buf) {
 						// "(it.size_size_entries * it.nb_files_entries) / SECTOR_SIZE" sectors for all file entries
 						// "it.first" sectors to skip the superblock
 						read_sector((it.size_file_entries * it.nb_file_entries) / SECTOR_SIZE + it.first + (it.current.blocks[i] * it.size_block) + j, buf + j * SECTOR_SIZE);	
-			}
+						
 			return 0;
 			
 		} 
@@ -150,7 +150,7 @@ file_iterator_t file_iterator() {
 	it.size_block 		 = sizeblock;
 	it.size_bitmap 	 	 = sizebitmap;
 	it.size_file_entries = sizefileentries;
-	//it.size_data_blocks  = sizefileentries;
+	it.size_data_blocks  = sizedatablocks;
 	it.nb_file_entries   = nbfileentries;
 	it.index             = -1;
 	it.first             = sizeblock + (sizebitmap * sizeblock);
@@ -167,7 +167,7 @@ file_iterator_t file_iterator() {
  * d'initialiser l'itérateur it avec la fonction file_iterator avant d'appeler la fonction
  * file_next.
  */
-int file_next(char *filename, file_iterator_t *it){
+int file_next(char* filename, file_iterator_t* it){
 	
 	char sector[SECTOR_SIZE];
 	int offset = 0;
