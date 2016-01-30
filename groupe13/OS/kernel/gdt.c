@@ -75,53 +75,6 @@ uint gdt_entry_to_selector(gdt_entry_t *entry) {
 	return GDT_INDEX_TO_SELECTOR(entry - gdt);
 }
 
-// Executes a binary program
-int exec(char* bin) {
-	
-	// Looking for free task
-	int index = -1;
-	for (int i = 0; i < tasks_nb; i++)
-		if (tasks[i].free) {
-			index = i;
-			break;
-		}
-	if (index < 0) return 1;
-	
-	stat_t* s = &((stat_t) { "", 0 });
-	file_iterator_t it = file_iterator();
-	int block_size = SECTOR_SIZE * it.size_block;
-	// Read program if existing
-	if ((file_exists(bin)) && (!file_stat(bin, s))) {
-		
-		// Allocating a integer number of blocks for the buffer
-		int bufsize = s->size + (block_size - (s->size % block_size));
-		char* buf[bufsize];
-		if (file_read(bin, &buf)) return 3;
-		
-		// Copy binary program at the right address
-		memcpy((uint32_t*) tasks[index].addr, &buf, bufsize);
-		
-		/*
-		// Init task
-		"Le TSS de la tâche doit être initialisé correctement : en particulier, 
-		le programme a dû être chargé à l'adresse où est mappé le segment de 
-		code de la LDT et le pointeur d'instruction doit pointer sur l'adresse de
-		la première instruction (adresse 0)."
-		
-		// Call task with corresponding TSS selector
-		call_task((uint16_t) &gdt[4 + index * 2]); 
-		*/
-		
-		// Update structure array
-		tasks[index].free = 0;
-		
-	}
-	else return 2;
-	
-	return 0;
-	
-}
-
 // Init a task in the GDT at specified index (LDT at index + 1)
 void setup_task(int index) {
 
@@ -131,8 +84,8 @@ void setup_task(int index) {
 	// Add the task's TSS and LDT to the GDT
 	gdt[4 + 2 * index] = gdt_make_tss(&task_tss, DPL_KERNEL);
 	gdt[5 + 2 * index] = gdt_make_ldt((uint32_t)task_ldt, sizeof(task_ldt)-1, DPL_KERNEL);
-	// int gdt_tss_sel = gdt_entry_to_selector(&gdt[index]); Commented because unused. Correct if it changes
-	int gdt_ldt_sel = gdt_entry_to_selector(&gdt[index + 1]);
+	int gdt_tss_sel = gdt_entry_to_selector(&gdt[4 + 2 * index]); 
+	int gdt_ldt_sel = gdt_entry_to_selector(&gdt[5 + 2 * index]);
 
 	// Define code and data segments in the LDT; both segments are overlapping
 	uint32_t task_addr = 0x80000 + index * 0x100000;  // 8MB for each task
@@ -142,8 +95,8 @@ void setup_task(int index) {
 	task_ldt[ldt_code_idx] = code_segment(task_addr, limit / 4096, DPL_USER);  // code
 	task_ldt[ldt_data_idx] = data_segment(task_addr, limit / 4096, DPL_USER);  // data + stack
 
-	// Structure array init
-	tasks[index].free = 1;
+	// Structure array change
+	tasks[index].free = 0;
 	tasks[index].addr = task_addr;
 	
 	// Initialize the TSS fields
@@ -166,8 +119,44 @@ void setup_task(int index) {
 	
 }
 
+// Executes a binary program
+int exec(char* bin) {
+	
+	// Looking for free task
+	int index = -1;
+	for (int i = 0; i < tasks_nb; i++)
+		if (tasks[i].free) {
+			index = i;
+			break;
+		}
+	if (index < 0) return 1;
+	
+	// Read program if existing
+	if (file_exists(bin)) {
+		
+		// Copy binary program at the right address
+		if (file_read(bin, (uint32_t*) tasks[index].addr)) return 3;
+		
+		// Init task
+		setup_task(index);
+		
+		// Call task with corresponding TSS selector
+		call_task((uint16_t) &gdt[4 + index * 2]); 
+		
+		// End of routine
+		return 0;
+		
+	}
+	else return 2;
+	
+}
+
 // Initialize the GDT
 void gdt_init() {
+
+	// Init structure array
+	for (int i = 0; i < tasks_nb; i++)
+		tasks[i] = (task_t) { -1, -1 };
 
 	// Set the address and the size of the GDT in the pointer
 	gdt_ptr.limit = sizeof(gdt);
@@ -191,10 +180,6 @@ void gdt_init() {
 	
 	// Load the task register to point to the initial TSS selector
 	load_task_register(gdt_entry_to_selector(&gdt[3]));
-
-	// Setup 8 tasks (2 entries each in the GDT)
-	for (int i = 0; i < tasks_nb; i++)
-		setup_task(i);	
 	
 	// Confirmation message
 	set_text_color(LIGHT_GREEN);

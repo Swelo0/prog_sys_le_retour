@@ -44,7 +44,11 @@ typedef struct task_st {
 
 extern void gdt_init();
 extern void gdt_flush(gdt_ptr_t *gdt_ptr);
+
+// Defined in ask_asm.s
 extern void load_task_register(uint16_t tss_selector); 
+extern void call_task(uint16_t tss_selector);
+
 int exec(char* bin);
 
 #endif
