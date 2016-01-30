@@ -41,14 +41,12 @@ int file_read(char* filename, void* buf) {
 	
 	char current_filename[FILENAME_SIZE] = "";
 	file_iterator_t it = file_iterator();
-	
 	// Iterator looking for file
 	while (file_next(current_filename, &it)) {
 		// File found
 		if (!strcmp(current_filename, filename)) {
-			
 			// Parsing data blocks
-			for (int i = 0; i < MAX_BLOCKS; i++) 
+			for (int i = 0; i < MAX_BLOCKS; i++) {
 				// Ignoring blocks indexed 0
 				if (!it.current.blocks[i])
 					break;
@@ -57,8 +55,8 @@ int file_read(char* filename, void* buf) {
 					for (int j = 0; j < it.size_block; j++)
 						// "(it.size_size_entries * it.nb_files_entries) / SECTOR_SIZE" sectors for all file entries
 						// "it.first" sectors to skip the superblock
-						read_sector((it.size_file_entries * it.nb_file_entries) / SECTOR_SIZE + it.first + (it.current.blocks[i] * it.size_block) + j + 1, buf + j * SECTOR_SIZE);					
-
+						read_sector((it.size_file_entries * it.nb_file_entries) / SECTOR_SIZE + it.first + (it.current.blocks[i] * it.size_block) + j, buf + j * SECTOR_SIZE);	
+			}
 			return 0;
 			
 		} 
@@ -151,8 +149,8 @@ file_iterator_t file_iterator() {
 	
 	it.size_block 		 = sizeblock;
 	it.size_bitmap 	 	 = sizebitmap;
-	it.size_file_entries = nbfileentries;
-	it.size_data_blocks  = sizefileentries;
+	it.size_file_entries = sizefileentries;
+	//it.size_data_blocks  = sizefileentries;
 	it.nb_file_entries   = nbfileentries;
 	it.index             = -1;
 	it.first             = sizeblock + (sizebitmap * sizeblock);
