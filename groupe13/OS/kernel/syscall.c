@@ -29,6 +29,7 @@ int syscall_handler(syscall_t nb, uint32_t arg1, uint32_t arg2, uint32_t arg3, u
 			break;
 			
 		case SYSCALL_EXEC:
+			ret = exec((char*)arg1);
 			break;
 			
 		case SYSCALL_GETC:
@@ -36,21 +37,27 @@ int syscall_handler(syscall_t nb, uint32_t arg1, uint32_t arg2, uint32_t arg3, u
 			break;
 			
 		case SYSCALL_FILE_STAT:
+			ret = file_stat((char*)arg1,(stat_t*)arg2);
 			break;
 			
 		case SYSCALL_FILE_READ:
+			ret = file_read((char*)arg1,(void*)arg2);
 			break;
 			
 		case SYSCALL_FILE_REMOVE:
+			ret = file_remove((char*)arg1);
 			break;
 			
 		case SYSCALL_FILE_ITERATOR:
+			ret = (int)file_iterator();
 			break;
 			
 		case SYSCALL_FILE_NEXT:
+			ret = file_next((char*)arg1,(file_iterator_t*)arg2);
 			break;
 			
 		case SYSCALL_GET_TICKS:
+			
 			break;
 			
 		default:
