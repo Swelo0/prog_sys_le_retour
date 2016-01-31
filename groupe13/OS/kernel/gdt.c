@@ -155,8 +155,14 @@ int exec(char* bin) {
 }*/
 
 int exec(char*program){
+/*
+	for (int i = 0; i < tasks_nb; i++)
+		setup_task(i);*/
+	for (int i = 0; i < tasks_nb; i++)
+		printf("test free %d \n", tasks[i].free);
+		
 	int task=-1;
-	extern void call_task(uint16_t tss_selector); 
+	//extern void call_task(uint16_t tss_selector); 
 
 	/* 1. trouver une tÃ¢che libre (S'il n'y en a pas, la fonction est Ã©chouÃ©e)
 	--------------------------------------------------------------------------------------------------------------------------*/
@@ -168,26 +174,26 @@ int exec(char*program){
 		}
 	}
 	if(task == -1){return -5;}
-
+	printf("ok \n");
 	/* 2. charger le contenu du fichier
 	--------------------------------------------------------------------------------------------------------------------------*/
 	stat_t stat;
 	
 	// lire les stats du fichier
 	if (file_stat(program, &stat) != 0){ return -2;}
-
+	printf("file stat ok \n");
 	// lire l'adresse de la tÃ¢che
 	uint32_t* addr = (uint32_t*) tasks[task].addr;	
 	// lire le contenu du fichier directement Ã  la bonne adresse
 	if(file_read(program, addr) != 0){  return -3;}
-
+	printf("file read ok \n");
 	/* 3. commuter vers la tÃ¢che 
 	--------------------------------------------------------------------------------------------------------------------------*/
 	call_task(tasks[task].gdt_tss_sel);
 	tasks[task].free = 0;
 	tasks[task].task_tss.eip = 0;
 	tasks[task].task_tss.esp = tasks[task].task_tss.ebp = 0x100000;  // stack pointers
-	
+	printf("fin exec ok \n");
 	/* 4. indiquer si l'exÃ©cution Ã  Ã©chouÃ© ou non
 	--------------------------------------------------------------------------------------------------------------------------*/	
 	return 0;
@@ -197,10 +203,9 @@ int exec(char*program){
 // Initialize the GDT
 void gdt_init() {
 
-	// Init structure array
 	for (int i = 0; i < tasks_nb; i++)
-		tasks[i] = (task_t) { -1, -1 };
-
+		setup_task(i);
+		
 	// Set the address and the size of the GDT in the pointer
 	gdt_ptr.limit = sizeof(gdt);
 	gdt_ptr.base = (uint32_t)&gdt;
