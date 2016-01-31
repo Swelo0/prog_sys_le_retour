@@ -73,6 +73,7 @@ void clear_display()
     {
         display[i] = (text_color << 8) | (background_color << 12);
     }
+	set_cursor_offset(0);
 }
 
 //////////////////////////////// COLORS HANDLING FUNCTIONS ///////////////////////////////

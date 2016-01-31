@@ -56,7 +56,15 @@ void keyboard_handler() {
 	uint8_t state = (sc >> 7);  
 	
 	switch (code) {
-		
+	
+		// Backslash
+		case CODE_BACKSLASH:
+			if ((!state) && (!buffer_full)) {
+				buffer[buffer_write] = ASCII_BACKSLASH; 
+				buffer_write = (buffer_write + 1) % BUFFER_SIZE;
+			}
+			break;
+	
 		// Shift
 		case CODE_LEFT_SHIFT:
 		case CODE_RIGHT_SHIFT:

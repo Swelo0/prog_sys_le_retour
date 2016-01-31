@@ -31,9 +31,11 @@
 #define CODE_DOWN			0x50
 #define CODE_RIGHT			0x4D
 #define CODE_LEFT			0x4B
+#define CODE_BACKSLASH		86
 // ASCII values
 #define ASCII_BACKSPACE		8
 #define ASCII_LINEFEED		10
+#define ASCII_BACKSLASH		92
 // Unused values to reference the directional arrows' ASCII
 #define ASCII_UP			1024
 #define ASCII_DOWN			1025
