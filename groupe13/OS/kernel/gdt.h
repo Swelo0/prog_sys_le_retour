@@ -8,6 +8,9 @@
 #include "task.h"
 #include "pfs.h"
 
+#define GDT_INDEX_TO_SELECTOR(idx) ((idx) << 3)
+#define GDT_SELECTOR_TO_INDEX(idx) ((idx) >> 3)
+
 // Structure of a GDT descriptor. There are 2 types of descriptors: segments and TSS.
 // Section 3.4.5 of Intel 64 & IA32 architectures software developer's manual describes
 // segment descriptors while section 6.2.2 describes TSS descriptors.

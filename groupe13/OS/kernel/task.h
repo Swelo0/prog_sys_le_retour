@@ -7,6 +7,7 @@
 #define IOMAP 0
 
 #define TASK_LIMIT 0x100000
+#define FIRST_TASK 0x80000
 
 // Task-State Segment (TSS) structure.
 typedef struct tss_st {

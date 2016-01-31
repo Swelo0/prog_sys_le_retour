@@ -9,8 +9,6 @@
 
 #include "gdt.h"
 
-#define GDT_INDEX_TO_SELECTOR(idx) ((idx) << 3)
-
 // Task structures array
 int tasks_nb = 8;
 task_t tasks[8];
@@ -20,6 +18,10 @@ static gdt_entry_t gdt[20];
 
 // Pointer on the GDT
 static gdt_ptr_t gdt_ptr;
+
+task_t* get_task(uint32_t tss_selector) {
+    return &tasks[(GDT_SELECTOR_TO_INDEX(tss_selector) - 4) / 2];
+}
 
 // Build and return a GDT entry given the various arguments (see Intel manuals).
 static gdt_entry_t build_entry(uint32_t base, uint32_t limit, uint8_t type, uint8_t s, uint8_t db, uint8_t granularity, uint8_t dpl) {
@@ -88,7 +90,7 @@ void setup_task(int index) {
 	int gdt_ldt_sel = gdt_entry_to_selector(&gdt[5 + 2 * index]);
 	
 	// Define code and data segments in the LDT; both segments are overlapping
-	uint32_t task_addr = 0x80000 + index * TASK_LIMIT;  // 8MB for each task
+	uint32_t task_addr = FIRST_TASK + index * TASK_LIMIT;  // 8MB for each task
 	int ldt_code_idx = 0;
 	int ldt_data_idx = 1;
 	uint limit = 0x10000;  // limit of 64KB
@@ -114,9 +116,9 @@ void setup_task(int index) {
 	task_tss.esp0 = (uint32_t) (task_kernel_stack) + sizeof(task_kernel_stack);
 	
 	// Structure array update
-	tasks[index].free = 0;
-	tasks[index].addr = task_addr;
-	tasks[index].task_tss  = task_tss;
+	tasks[index].free        = 0;
+	tasks[index].addr        = task_addr;
+	tasks[index].task_tss    = task_tss;
 	tasks[index].gdt_tss_sel = gdt_tss_sel;
 	
 }
@@ -144,7 +146,7 @@ int exec(char* bin) {
 		call_task(tasks[index].gdt_tss_sel); 
 		
 		// Structure array reset
-		tasks[index].task_tss.eip = tasks[index].free         = 0;
+		tasks[index].task_tss.eip = tasks[index].free         = 0;			 // instruction pointer and freedom
 		tasks[index].task_tss.esp = tasks[index].task_tss.ebp = TASK_LIMIT;  // stack pointers
 		
 		// End of routine
@@ -164,7 +166,7 @@ void gdt_init() {
 		
 	// Set the address and the size of the GDT in the pointer
 	gdt_ptr.limit = sizeof(gdt);
-	gdt_ptr.base = (uint32_t)&gdt;
+	gdt_ptr.base = (uint32_t) &gdt;
 	
 	// Initializing the three segment descriptors in the GDT : NULL, code segment, data segment
 	gdt[0] = null_segment();

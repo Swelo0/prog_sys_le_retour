@@ -45,7 +45,7 @@ int atoi(char* s) {
     return k;
 }
 
-int getc() { 
+int getc() {
 	return syscall(SYSCALL_GETC, 0, 0, 0, 0, 0);
 }
 
