@@ -10,6 +10,7 @@
 #include "io.h"
 #include "keyboard.h"
 #include "pfs.h"
+#include "timer.h"
 
 #define UNUSED(x) ((void)(x))
 
@@ -21,46 +22,80 @@ int syscall_handler(syscall_t nb, uint32_t arg1, uint32_t arg2, uint32_t arg3, u
 	switch (nb) {
 		
 		case SYSCALL_PUTC:
+			UNUSED(arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
 			print_char((char) arg1);
 			break;
 			
 		case SYSCALL_PUTS:
+			UNUSED(arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
 			print_str((char*) arg1);
 			break;
 			
 		case SYSCALL_EXEC:
-			ret = exec((char*)arg1);
+			UNUSED(arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
+			ret = exec((char*) arg1);
 			break;
 			
 		case SYSCALL_GETC:
+			UNUSED(arg1);
+			UNUSED(arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
 			ret = getc();
 			break;
 			
 		case SYSCALL_FILE_STAT:
-			ret = file_stat((char*)arg1,(stat_t*)arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
+			ret = file_stat((char*) arg1, (stat_t*) arg2);
 			break;
 			
 		case SYSCALL_FILE_READ:
-			ret = file_read((char*)arg1,(void*)arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
+			ret = file_read((char*) arg1, (void*) arg2);
 			break;
 			
 		case SYSCALL_FILE_REMOVE:
-			ret = file_remove((char*)arg1);
+			UNUSED(arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
+			ret = file_remove((char*) arg1);
 			break;
 			
 		case SYSCALL_FILE_ITERATOR:
-			ret = (int)file_iterator();
+			UNUSED(arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
+			file_iterator_t it = file_iterator();
+			arg1 = (uint32_t) &it;
 			break;
 			
 		case SYSCALL_FILE_NEXT:
-			ret = file_next((char*)arg1,(file_iterator_t*)arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
+			ret = file_next((char*) arg1, (file_iterator_t*) arg2);
 			break;
 			
 		case SYSCALL_GET_TICKS:
-			
+			UNUSED(arg1);
+			UNUSED(arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
+			ret = get_ticks();
 			break;
 			
 		default:
+			UNUSED(arg1);
+			UNUSED(arg2);
+			UNUSED(arg3);
+			UNUSED(arg4);
 			break;
 		
 	}

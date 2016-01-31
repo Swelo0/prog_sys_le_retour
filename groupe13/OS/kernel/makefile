@@ -63,7 +63,7 @@ ide.o:	ide.c ide.h x86.h ../common/types.h io.h
 pfs.o:	pfs.c pfs.h ../common/types.h ide.h string.h io.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
-syscall.o:	syscall.c ../common/types.h ../common/syscall_nb.h io.h keyboard.h pfs.h
+syscall.o:	syscall.c ../common/types.h ../common/syscall_nb.h io.h keyboard.h pfs.h timer.h
 	$(CC) $< -o $@ $(CFLAGS)
 	
 syscall_asm.o:	syscall_asm.s const.inc
