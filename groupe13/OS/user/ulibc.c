@@ -1,27 +1,29 @@
 #include "ulibc.h"
 
 int read_file(char* filename, uchar* buf) { 
-	return syscall(SYSCALL_FILE_READ, filename, buf, 0, 0, 0);
+	return syscall(SYSCALL_FILE_READ, (uint32_t) filename, (uint32_t) buf, 0, 0, 0);
 }
 
 int get_stat(char* filename, stat_t* stat) { 
-	return syscall(SYSCALL_FILE_STAT, filename, stat, 0, 0, 0);
+	return syscall(SYSCALL_FILE_STAT, (uint32_t) filename, (uint32_t) stat, 0, 0, 0);
 }
 
 int remove_file(char* filename) { 
-	return syscall(SYSCALL_FILE_REMOVE, filename, 0, 0, 0, 0);
+	return syscall(SYSCALL_FILE_REMOVE, (uint32_t) filename, 0, 0, 0, 0);
 }
 
-file_iterator_t get_file_iterator(){  
-	return syscall(SYSCALL_FILE_ITERATOR, 0, 0, 0, 0, 0);
+file_iterator_t* get_file_iterator() {  
+	file_iterator_t* it;
+	syscall(SYSCALL_FILE_ITERATOR, (uint32_t) it, 0, 0, 0, 0);
+	return (file_iterator_t*) it;
 }
 
 int get_next_file(char* filename, file_iterator_t* it) { 
-	return syscall(SYSCALL_FILE_NEXT, 0, 0, 0, 0, 0);
+	return syscall(SYSCALL_FILE_NEXT, (uint32_t) filename, (uint32_t) it, 0, 0, 0);
 }
 
-int exec(char* filename){ 
-	return syscall(SYSCALL_EXEC, filename, 0, 0, 0, 0);
+int exec(char* filename) { 
+	return syscall(SYSCALL_EXEC, (uint32_t) filename, 0, 0, 0, 0);
 }
 
 void exit() { 
@@ -37,7 +39,7 @@ int strlen(char* s) {
 int atoi(char* s) { 
 	int k = 0;
     while (*s) {
-        s = (k<<3)+(k<<1)+(*s)-'0';
+        s = (char*) (k << 3) + (k << 1) + (*s) - '0';
         s++;
     }
     return k;
@@ -48,18 +50,18 @@ int getc() {
 }
 
 void putc(char c) {
-	return syscall(SYSCALL_PUTC, c, 0, 0, 0, 0);
+	syscall(SYSCALL_PUTC, (uint32_t) c, 0, 0, 0, 0);
 }
 
 void puts(char* str) { 
-	return syscall(SYSCALL_PUTS, str, 0, 0, 0, 0);
+	syscall(SYSCALL_PUTS, (uint32_t) str, 0, 0, 0, 0);
 }
 
 void print_int(int32_t n)
 {
     if (n < 0)
     {
-        pputc('-');
+        putc('-');
         print_int(-n);
     }
     else
@@ -94,7 +96,7 @@ void print_hex(uint32_t n)
     }
     else
     {
-        putc(char)(unit + 55));
+        putc((char)(unit + 55));
     }
 }
 
@@ -150,12 +152,13 @@ void printf(char* frmt, ...) {
 
 void sleep(uint ms) { 
 
-	// Ticks à attendre
+	/* Ticks à attendre
 	uint wait = (1193180 / frequence_divise) * (ms / 1000);
 	// Référence
 	uint ref = ticks;
 	// Boucle
 	while (get_ticks() <= (ref + wait));
+	*/
 	
 }
 
