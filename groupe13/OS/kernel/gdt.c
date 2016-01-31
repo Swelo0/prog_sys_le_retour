@@ -86,20 +86,14 @@ void setup_task(int index) {
 	gdt[5 + 2 * index] = gdt_make_ldt((uint32_t)task_ldt, sizeof(task_ldt)-1, DPL_KERNEL);
 	int gdt_tss_sel = gdt_entry_to_selector(&gdt[4 + 2 * index]); 
 	int gdt_ldt_sel = gdt_entry_to_selector(&gdt[5 + 2 * index]);
-	tasks[index].task_tss  = task_tss;
-	tasks[index].gdt_tss_sel = gdt_tss_sel;
-
+	
 	// Define code and data segments in the LDT; both segments are overlapping
-	uint32_t task_addr = 0x80000 + index * 0x100000;  // 8MB for each task
+	uint32_t task_addr = 0x80000 + index * TASK_LIMIT;  // 8MB for each task
 	int ldt_code_idx = 0;
 	int ldt_data_idx = 1;
 	uint limit = 0x10000;  // limit of 64KB
 	task_ldt[ldt_code_idx] = code_segment(task_addr, limit / 4096, DPL_USER);  // code
 	task_ldt[ldt_data_idx] = data_segment(task_addr, limit / 4096, DPL_USER);  // data + stack
-
-	// Structure array change
-	tasks[index].free = 0;
-	tasks[index].addr = task_addr;
 	
 	// Initialize the TSS fields
 	// The LDT selector must point to the task's LDT
@@ -118,6 +112,12 @@ void setup_task(int index) {
 	static uchar task_kernel_stack[8192];
 	task_tss.ss0 = GDT_KERNEL_DATA_SELECTOR;
 	task_tss.esp0 = (uint32_t) (task_kernel_stack) + sizeof(task_kernel_stack);
+	
+	// Structure array update
+	tasks[index].free = 0;
+	tasks[index].addr = task_addr;
+	tasks[index].task_tss  = task_tss;
+	tasks[index].gdt_tss_sel = gdt_tss_sel;
 	
 }
 
@@ -144,8 +144,7 @@ int exec(char* bin) {
 		call_task(tasks[index].gdt_tss_sel); 
 		
 		// Structure array reset
-		tasks[index].free = 0;
-		tasks[index].task_tss.eip = 0;
+		tasks[index].task_tss.eip = tasks[index].free         = 0;
 		tasks[index].task_tss.esp = tasks[index].task_tss.ebp = TASK_LIMIT;  // stack pointers
 		
 		// End of routine

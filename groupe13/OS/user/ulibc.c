@@ -162,8 +162,8 @@ void sleep(uint ms) {
 	
 }
 
-int get_ticks() { 
-	return syscall(SYSCALL_GET_TICKS, 0, 0, 0, 0, 0);
+uint get_ticks() { 
+	return (uint) syscall(SYSCALL_GET_TICKS, 0, 0, 0, 0, 0);
 }
 
 char *
