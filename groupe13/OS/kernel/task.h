@@ -6,6 +6,8 @@
 // It requires an extra 8KB in the TSS to store the ports bitmap.
 #define IOMAP 0
 
+#define TASK_LIMIT 0x100000
+
 // Task-State Segment (TSS) structure.
 typedef struct tss_st {
 	uint16_t previous_task_link, reserved0;

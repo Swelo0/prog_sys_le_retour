@@ -121,30 +121,32 @@ void setup_task(int index) {
 	
 }
 
-/*
 // Executes a binary program
 int exec(char* bin) {
 	
 	// Looking for free task
 	int index = -1;
 	for (int i = 0; i < tasks_nb; i++)
-		if (tasks[i].free) {
+		if (!tasks[i].free) {
 			index = i;
+			tasks[i].free = 1;
 			break;
 		}
 	if (index < 0) return 1;
-	
+
 	// Read program if existing
 	if (file_exists(bin)) {
 		
 		// Copy binary program at the right address
 		if (file_read(bin, (uint32_t*) tasks[index].addr)) return 3;
 		
-		// Init task
-		setup_task(index);
+		// Commute to task with corresponding TSS as argument
+		call_task(tasks[index].gdt_tss_sel); 
 		
-		// Call task with corresponding TSS selector
-		call_task((uint16_t) &gdt[4 + index * 2]); 
+		// Structure array reset
+		tasks[index].free = 0;
+		tasks[index].task_tss.eip = 0;
+		tasks[index].task_tss.esp = tasks[index].task_tss.ebp = TASK_LIMIT;  // stack pointers
 		
 		// End of routine
 		return 0;
@@ -152,57 +154,12 @@ int exec(char* bin) {
 	}
 	else return 2;
 	
-}*/
-
-int exec(char*program){
-/*
-	for (int i = 0; i < tasks_nb; i++)
-		setup_task(i);*/
-	for (int i = 0; i < tasks_nb; i++)
-		printf("test free %d \n", tasks[i].free);
-		
-	int task=-1;
-	//extern void call_task(uint16_t tss_selector); 
-
-	/* 1. trouver une tÃ¢che libre (S'il n'y en a pas, la fonction est Ã©chouÃ©e)
-	--------------------------------------------------------------------------------------------------------------------------*/
-	for(int i = 0; i < 8; i++){
-		if(tasks[i].free == 0){
-			task = i;
-			tasks[task].free = 1;
-			break;
-		}
-	}
-	if(task == -1){return -5;}
-	printf("ok \n");
-	/* 2. charger le contenu du fichier
-	--------------------------------------------------------------------------------------------------------------------------*/
-	stat_t stat;
-	
-	// lire les stats du fichier
-	if (file_stat(program, &stat) != 0){ return -2;}
-	printf("file stat ok \n");
-	// lire l'adresse de la tÃ¢che
-	uint32_t* addr = (uint32_t*) tasks[task].addr;	
-	// lire le contenu du fichier directement Ã  la bonne adresse
-	if(file_read(program, addr) != 0){  return -3;}
-	printf("file read ok \n");
-	/* 3. commuter vers la tÃ¢che 
-	--------------------------------------------------------------------------------------------------------------------------*/
-	call_task(tasks[task].gdt_tss_sel);
-	tasks[task].free = 0;
-	tasks[task].task_tss.eip = 0;
-	tasks[task].task_tss.esp = tasks[task].task_tss.ebp = 0x100000;  // stack pointers
-	printf("fin exec ok \n");
-	/* 4. indiquer si l'exÃ©cution Ã  Ã©chouÃ© ou non
-	--------------------------------------------------------------------------------------------------------------------------*/	
-	return 0;
 }
-
 
 // Initialize the GDT
 void gdt_init() {
 
+	// Tasks setup
 	for (int i = 0; i < tasks_nb; i++)
 		setup_task(i);
 		
