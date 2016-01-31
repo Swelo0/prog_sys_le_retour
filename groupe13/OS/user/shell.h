@@ -6,6 +6,6 @@ void Prompt();
 
 void resetCmd();
 
-int GetCmd();
+void GetCmd();
 
 int ExecCmd();

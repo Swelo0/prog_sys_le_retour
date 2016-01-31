@@ -2,7 +2,7 @@
 
 char* buffer;
 int buffSize = 0;
-char* cmdArgv;
+char* cmdArgv[10];
 int cmdArgc;
 
 
@@ -29,12 +29,12 @@ void resetCmd() {
 	}
 }
 
-int GetCmd(){
+void GetCmd(){
 	char input;
 	resetCmd();
 	while ((input != '\n') && (buffSize < INPUT_MAX_LENGTH)) {
 		buffer[buffSize++] = input;
-		input = getchar();
+		input = getc();
 	}
 	buffer[buffSize] = '\0';     
 	char* bufferTemp; //
@@ -47,34 +47,34 @@ int GetCmd(){
 }
 
 int ExecCmd(){
-	if (strcmp("ls", cmdArgv[0]) == 0) {
+	if (strncmp("ls", cmdArgv[0],2) == 0) {
 		return 1;
 	}
-	if (strcmp("cat", cmdArgv[0]) == 0) {
+	if (strncmp("cat", cmdArgv[0],3) == 0) {
 		if (cmdArgv[1] == NULL){
 			printf("Utilisation : cat <name_file> \n");
 			return 0;
 		}
-		read_file(cmdArgv[1],buffer);
+		read_file(cmdArgv[1],(uchar*)buffer);
 		printf(buffer);
 		return 1;
 	}
-	if (strcmp("rm", cmdArgv[0]) == 0) {
+	if (strncmp("rm", cmdArgv[0],2) == 0) {
 		return 1;
 	}
-	if (strcmp("run", cmdArgv[0]) == 0) {
+	if (strncmp("run", cmdArgv[0],3) == 0) {
 		return 1;
 	}
-	if (strcmp("ticks", cmdArgv[0]) == 0) {
+	if (strncmp("ticks", cmdArgv[0],5) == 0) {
 		return 1;
 	}
-	if (strcmp("sleep", cmdArgv[0]) == 0) {
+	if (strncmp("sleep", cmdArgv[0],5) == 0) {
 		return 1;
 	}
-	if (strcmp("exit", cmdArgv[0]) == 0) {
+	if (strncmp("exit", cmdArgv[0],4) == 0) {
 		return 1;
 	}
-	if (strcmp("help", cmdArgv[0]) == 0) {
+	if (strncmp("help", cmdArgv[0],4) == 0) {
 		return 1;
 	}
 	return 0;

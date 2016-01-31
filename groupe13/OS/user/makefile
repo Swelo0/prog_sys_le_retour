@@ -15,8 +15,8 @@ OBJS=$(APP).o $(STUB).o $(LIB).o $(CALL).o shell.o
 $(APP).elf:	$(OBJS)
 	ld $^ -o $@ -T$(LD) -melf_i386
 	
-$(APP).o:	$(APP).c
-	$(CC) $< -o $@ $(CFLAGS)
+#$(APP).o:	$(APP).c
+#	$(CC) $< -o $@ $(CFLAGS)
 
 $(STUB).o:	$(STUB).s
 	$(ASMC) $< -o $@ $(ASMFLAGS)
