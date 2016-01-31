@@ -43,17 +43,18 @@ void runKernel()
 	// Activation interruptions matérielles
 	sti();
 	
-	printf("+-------------------------------------+");
-	sleep(2000);
-	
 	// Splash screen
-	char buffer[4096];
-	file_read("splash.txt", buffer);
-	clear_display();
-	printf("%s\n", &buffer);
-	sleep(5000);
-	clear_display();
-	
+	#ifdef TEST
+		printf("+-------------------------------------+");
+		sleep(2000);
+		char buffer[4096];
+		file_read("splash.txt", buffer);
+		clear_display();
+		printf("%s\n", &buffer);
+		sleep(5000);
+		clear_display();
+	#endif
+
 	// Message
 	printf("+------------------------------------------------------------------------------+\n");
 	printf("                         Welcome in our humble kernel.\n");
@@ -64,7 +65,8 @@ void runKernel()
 		runTests();
     #endif
 	
-	//printf("Exec -> %d\n", exec("app.elf"));
+	int x = exec("app.elf");
+	printf("%d\n", x);
 	
 	// Reading keyboard and printing input
     while (1) 
