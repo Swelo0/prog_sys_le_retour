@@ -6,7 +6,7 @@ char* cmdArgv[10];
 int cmdArgc;
 
 
-void main() {
+void shell_handler() {
 	printf(" ---- Shell le coquillage de l'espace V0.1 \n");
 	
 	while(1){
