@@ -1,4 +1,4 @@
-
+#include "shell.h"
 
 char* buffer;
 int buffSize = 0;
@@ -6,16 +6,15 @@ char* cmdArgv;
 int cmdArgc;
 
 
-void main(int argc, char **argv) {
+void main() {
 	printf(" ---- Shell le coquillage de l'espace V0.1 \n");
 	
 	while(1){
 		Prompt();
 		GetCmd();
 		if (!ExecCmd())
-			printf("Commande inconnu, tapez ''help'' pour voir la liste des commandes valides. \n")
+			printf("Commande inconnu, tapez ''help'' pour voir la liste des commandes valides. \n");
 	}
-	return 0;
 }
 
 void Prompt(){
@@ -23,7 +22,7 @@ void Prompt(){
 }
 
 void resetCmd() {
-	bufferSize = 0;
+	buffSize = 0;
 	while(cmdArgc) {
 		cmdArgv[cmdArgc] = NULL;
         cmdArgc--;       
@@ -33,11 +32,11 @@ void resetCmd() {
 int GetCmd(){
 	char input;
 	resetCmd();
-	while ((input != '\n') && (bufferSize < INPUT_MAX_LENGTH)) {
-		buffer[bufferSize++] = input;
+	while ((input != '\n') && (buffSize < INPUT_MAX_LENGTH)) {
+		buffer[buffSize++] = input;
 		input = getchar();
 	}
-	buffer[bufferSize] = '\0';     
+	buffer[buffSize] = '\0';     
 	char* bufferTemp; //
 	bufferTemp = strtok(buffer, " ");
 	while (bufferTemp != NULL) {  
@@ -47,7 +46,7 @@ int GetCmd(){
 	}
 }
 
-void ExecCmd(){
+int ExecCmd(){
 	if (strcmp("ls", cmdArgv[0]) == 0) {
 		return 1;
 	}
