@@ -11,6 +11,7 @@
 #include "keyboard.h"
 #include "pfs.h"
 #include "timer.h"
+#include "gdt.h"
 
 #define UNUSED(x) ((void)(x))
 
