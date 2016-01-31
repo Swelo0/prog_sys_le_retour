@@ -40,6 +40,8 @@ typedef struct gdt_ptr_st {
 typedef struct task_st {
 	uint8_t free;
 	uint32_t addr;
+	tss_t task_tss; 
+	uint16_t gdt_tss_sel;
 } __attribute__((packed)) task_t;
 
 extern void gdt_init();

@@ -86,6 +86,8 @@ void setup_task(int index) {
 	gdt[5 + 2 * index] = gdt_make_ldt((uint32_t)task_ldt, sizeof(task_ldt)-1, DPL_KERNEL);
 	int gdt_tss_sel = gdt_entry_to_selector(&gdt[4 + 2 * index]); 
 	int gdt_ldt_sel = gdt_entry_to_selector(&gdt[5 + 2 * index]);
+	tasks[index].task_tss  = task_tss;
+	tasks[index].gdt_tss_sel = gdt_tss_sel;
 
 	// Define code and data segments in the LDT; both segments are overlapping
 	uint32_t task_addr = 0x80000 + index * 0x100000;  // 8MB for each task
@@ -119,6 +121,7 @@ void setup_task(int index) {
 	
 }
 
+/*
 // Executes a binary program
 int exec(char* bin) {
 	
@@ -149,7 +152,47 @@ int exec(char* bin) {
 	}
 	else return 2;
 	
+}*/
+
+int exec(char*program){
+	int task=-1;
+	extern void call_task(uint16_t tss_selector); 
+
+	/* 1. trouver une tÃ¢che libre (S'il n'y en a pas, la fonction est Ã©chouÃ©e)
+	--------------------------------------------------------------------------------------------------------------------------*/
+	for(int i = 0; i < 8; i++){
+		if(tasks[i].free == 0){
+			task = i;
+			tasks[task].free = 1;
+			break;
+		}
+	}
+	if(task == -1){return -5;}
+
+	/* 2. charger le contenu du fichier
+	--------------------------------------------------------------------------------------------------------------------------*/
+	stat_t stat;
+	
+	// lire les stats du fichier
+	if (file_stat(program, &stat) != 0){ return -2;}
+
+	// lire l'adresse de la tÃ¢che
+	uint32_t* addr = (uint32_t*) tasks[task].addr;	
+	// lire le contenu du fichier directement Ã  la bonne adresse
+	if(file_read(program, addr) != 0){  return -3;}
+
+	/* 3. commuter vers la tÃ¢che 
+	--------------------------------------------------------------------------------------------------------------------------*/
+	call_task(tasks[task].gdt_tss_sel);
+	tasks[task].free = 0;
+	tasks[task].task_tss.eip = 0;
+	tasks[task].task_tss.esp = tasks[task].task_tss.ebp = 0x100000;  // stack pointers
+	
+	/* 4. indiquer si l'exÃ©cution Ã  Ã©chouÃ© ou non
+	--------------------------------------------------------------------------------------------------------------------------*/	
+	return 0;
 }
+
 
 // Initialize the GDT
 void gdt_init() {
