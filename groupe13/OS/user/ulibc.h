@@ -27,5 +27,7 @@ void printf(char *fmt, ...);
 void sleep(uint ms);
 int get_ticks();
 
+char * strtok(register char *, register const char *);
+int strncmp(const char *p, const char *q, uint n);
 
 #endif

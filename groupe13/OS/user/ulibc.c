@@ -216,3 +216,19 @@ cont:
 	}
 	/* NOTREACHED */
 }
+
+int strncmp(const char *p, const char *q, uint n)
+{
+    for (uint i = 0; i < n; i++)
+    {
+        if (p[i] != q[i])
+        {
+            return (p[i] < q[i] ? -1 : 1);
+        }
+        else if (p[i] == '\0')
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
